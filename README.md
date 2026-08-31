@@ -75,6 +75,13 @@ AUTH_SECRET="replace-with-a-random-secret"
 
 `docker-compose.yml` starts PostgreSQL 18 with a persistent volume and creates `businessflow`, `businessflow_test`, and `businessflow_e2e` databases.
 
+PostgreSQL is exposed on port `5432` by default. If that port is already occupied, set `POSTGRES_PORT` before starting Compose and use the same port in `DATABASE_URL`:
+
+```powershell
+$env:POSTGRES_PORT="5433"
+docker compose up -d
+```
+
 ```bash
 docker compose up -d
 pnpm db:deploy

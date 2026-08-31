@@ -8,9 +8,9 @@ services:
       POSTGRES_PASSWORD: businessflow
       POSTGRES_DB: businessflow
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - businessflow_postgres_data:/var/lib/postgresql/data
+      - businessflow_postgres_data:/var/lib/postgresql
       - ./docker/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U businessflow -d businessflow"]

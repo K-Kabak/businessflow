@@ -146,19 +146,20 @@ export async function saveProjectAction(
   if (!parsed.success) return validationError(parsed.error);
   const { id, memberIds, budget, startDate, deadline, ...value } = parsed.data;
   const uniqueMemberIds = [...new Set(memberIds)];
-  const [client, memberCount] = await Promise.all([
+  const [client, members] = await Promise.all([
     prisma.client.findFirst({
       where: { id: value.clientId, organizationId: user.organizationId },
       select: { id: true },
     }),
-    prisma.user.count({
+    prisma.user.findMany({
       where: {
         id: { in: uniqueMemberIds },
         organizationId: user.organizationId,
       },
+      select: { id: true, name: true },
     }),
   ]);
-  if (!client || memberCount !== uniqueMemberIds.length)
+  if (!client || members.length !== uniqueMemberIds.length)
     return {
       success: false,
       code: "VALIDATION",
@@ -168,7 +169,9 @@ export async function saveProjectAction(
     if (id) {
       const existing = await prisma.project.findFirst({
         where: { id, organizationId: user.organizationId },
-        include: { members: true },
+        include: {
+          members: { include: { user: { select: { name: true } } } },
+        },
       });
       if (!existing)
         return {
@@ -176,14 +179,37 @@ export async function saveProjectAction(
           code: "NOT_FOUND",
           message: "Project not found.",
         };
+      const previousMemberIds = new Set(
+        existing.members.map((member) => member.userId),
+      );
+      const addedMemberIds = uniqueMemberIds.filter(
+        (memberId) => !previousMemberIds.has(memberId),
+      );
+      const removedMemberIds = existing.members
+        .filter((member) => !uniqueMemberIds.includes(member.userId))
+        .map((member) => member.userId);
+      const memberNames = new Map(
+        members.map((member) => [member.id, member.name]),
+      );
+      for (const member of existing.members)
+        memberNames.set(member.userId, member.user.name);
       await prisma.$transaction(async (tx) => {
-        const removed = existing.members
-          .filter((member) => !uniqueMemberIds.includes(member.userId))
-          .map((member) => member.userId);
-        if (removed.length)
+        if (removedMemberIds.length)
           await tx.task.updateMany({
-            where: { projectId: id, assigneeId: { in: removed } },
+            where: {
+              organizationId: user.organizationId,
+              projectId: id,
+              assigneeId: { in: removedMemberIds },
+            },
             data: { assigneeId: null },
+          });
+        if (removedMemberIds.length)
+          await tx.projectMember.deleteMany({
+            where: {
+              organizationId: user.organizationId,
+              projectId: id,
+              userId: { in: removedMemberIds },
+            },
           });
         await tx.project.update({
           where: { id },
@@ -192,15 +218,16 @@ export async function saveProjectAction(
             budget: budget ? new Prisma.Decimal(budget) : null,
             startDate: parseDateInput(startDate),
             deadline: parseDateInput(deadline),
-            members: {
-              deleteMany: {},
-              create: uniqueMemberIds.map((userId) => ({
-                userId,
-                organizationId: user.organizationId,
-              })),
-            },
           },
         });
+        if (addedMemberIds.length)
+          await tx.projectMember.createMany({
+            data: addedMemberIds.map((userId) => ({
+              projectId: id,
+              userId,
+              organizationId: user.organizationId,
+            })),
+          });
         await logActivity(tx, {
           organizationId: user.organizationId,
           userId: user.id,
@@ -217,6 +244,32 @@ export async function saveProjectAction(
               ? undefined
               : { previous: existing.status, next: value.status },
         });
+        for (const memberId of addedMemberIds) {
+          await logActivity(tx, {
+            organizationId: user.organizationId,
+            userId: user.id,
+            entityType: "PROJECT",
+            entityId: id,
+            action: "ASSIGNED",
+            description: `${user.name} added ${memberNames.get(memberId)} to project “${value.name}”.`,
+            metadata: { projectId: id, memberId, membershipChange: "ADDED" },
+          });
+        }
+        for (const memberId of removedMemberIds) {
+          await logActivity(tx, {
+            organizationId: user.organizationId,
+            userId: user.id,
+            entityType: "PROJECT",
+            entityId: id,
+            action: "ASSIGNED",
+            description: `${user.name} removed ${memberNames.get(memberId)} from project “${value.name}”.`,
+            metadata: {
+              projectId: id,
+              memberId,
+              membershipChange: "REMOVED",
+            },
+          });
+        }
       });
       revalidatePath("/projects");
       revalidatePath(`/projects/${id}`);
@@ -231,14 +284,16 @@ export async function saveProjectAction(
           budget: budget ? new Prisma.Decimal(budget) : null,
           startDate: parseDateInput(startDate),
           deadline: parseDateInput(deadline),
-          members: {
-            create: uniqueMemberIds.map((userId) => ({
-              userId,
-              organizationId: user.organizationId,
-            })),
-          },
         },
       });
+      if (uniqueMemberIds.length)
+        await tx.projectMember.createMany({
+          data: uniqueMemberIds.map((userId) => ({
+            projectId: project.id,
+            userId,
+            organizationId: user.organizationId,
+          })),
+        });
       await logActivity(tx, {
         organizationId: user.organizationId,
         userId: user.id,
@@ -301,6 +356,7 @@ export async function saveTaskAction(
       code: "VALIDATION",
       message: "Select a project in your organization.",
     };
+  let assigneeName: string | null = null;
   if (assigneeId) {
     const member = await prisma.projectMember.findFirst({
       where: {
@@ -308,6 +364,7 @@ export async function saveTaskAction(
         userId: assigneeId,
         organizationId: user.organizationId,
       },
+      select: { user: { select: { name: true } } },
     });
     if (!member)
       return {
@@ -316,11 +373,13 @@ export async function saveTaskAction(
         message: "Assignee must be a project member.",
         fieldErrors: { assigneeId: ["Assignee must be a project member."] },
       };
+    assigneeName = member.user.name;
   }
   try {
     if (id) {
       const existing = await prisma.task.findFirst({
         where: { id, organizationId: user.organizationId },
+        include: { assignee: { select: { name: true } } },
       });
       if (!existing)
         return {
@@ -328,12 +387,14 @@ export async function saveTaskAction(
           code: "NOT_FOUND",
           message: "Task not found.",
         };
+      const nextAssigneeId = assigneeId || null;
+      const assigneeChanged = existing.assigneeId !== nextAssigneeId;
       await prisma.$transaction(async (tx) => {
         await tx.task.update({
           where: { id },
           data: {
             ...value,
-            assigneeId: assigneeId || null,
+            assigneeId: nextAssigneeId,
             deadline: parseDateInput(deadline),
           },
         });
@@ -355,6 +416,26 @@ export async function saveTaskAction(
               }
             : { projectId: value.projectId },
         });
+        if (assigneeChanged) {
+          const description = existing.assignee
+            ? assigneeName
+              ? `${user.name} reassigned task “${value.title}” from ${existing.assignee.name} to ${assigneeName}.`
+              : `${user.name} unassigned ${existing.assignee.name} from task “${value.title}”.`
+            : `${user.name} assigned task “${value.title}” to ${assigneeName}.`;
+          await logActivity(tx, {
+            organizationId: user.organizationId,
+            userId: user.id,
+            entityType: "TASK",
+            entityId: id,
+            action: "ASSIGNED",
+            description,
+            metadata: {
+              previousAssigneeId: existing.assigneeId,
+              nextAssigneeId,
+              projectId: value.projectId,
+            },
+          });
+        }
       });
       revalidatePath("/tasks");
       revalidatePath("/board");
@@ -384,6 +465,21 @@ export async function saveTaskAction(
         description: `${user.name} created task “${task.title}”.`,
         metadata: { projectId: task.projectId },
       });
+      if (assigneeId) {
+        await logActivity(tx, {
+          organizationId: user.organizationId,
+          userId: user.id,
+          entityType: "TASK",
+          entityId: task.id,
+          action: "ASSIGNED",
+          description: `${user.name} assigned task “${task.title}” to ${assigneeName}.`,
+          metadata: {
+            previousAssigneeId: null,
+            nextAssigneeId: assigneeId,
+            projectId: task.projectId,
+          },
+        });
+      }
       return task;
     });
     revalidatePath("/tasks");

@@ -16,7 +16,7 @@ import {
   thClass,
 } from "@/components/ui/page";
 import { Pagination } from "@/components/ui/pagination";
-import { projectScope, requireUser } from "@/lib/auth-helpers";
+import { clientScope, projectScope, requireUser } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/db";
 import { formatDate } from "@/lib/format";
 import { calculateProjectProgress } from "@/lib/utils";
@@ -82,7 +82,7 @@ export default async function ProjectsPage({
     }),
     prisma.project.count({ where }),
     prisma.client.findMany({
-      where: { organizationId: user.organizationId },
+      where: clientScope(user),
       orderBy: { name: "asc" },
       select: { id: true, name: true },
     }),

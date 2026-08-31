@@ -1,9 +1,12 @@
 import type { Prisma } from "@/generated/prisma/client";
+import { Clock3, X } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/form-controls";
 import {
   EmptyState,
+  FilterBar,
   PageHeader,
   TableShell,
   tdClass,
@@ -69,7 +72,8 @@ export default async function ActivityPage({
         title="Activity"
         description="A read-only audit trail for the work you can access."
       />
-      <form className="grid gap-3 sm:grid-cols-[200px_220px_auto]">
+      <FilterBar>
+      <form className="grid gap-2 sm:grid-cols-[200px_220px_auto]">
         <Select name="entity" defaultValue={entity}>
           <option value="">All entities</option>
           {validEntities.map((value) => (
@@ -86,11 +90,13 @@ export default async function ActivityPage({
             </option>
           ))}
         </Select>
-        <Button variant="outline">Apply filters</Button>
+        <Button variant="secondary">Apply filters</Button>
       </form>
+      {entity || actor ? <div className="mt-2 flex items-center border-t px-1 pt-2 text-xs"><span className="text-muted-foreground">Filters active</span><Link href="/activity" className="text-muted-foreground hover:text-foreground ml-auto inline-flex items-center gap-1"><X className="size-3" /> Clear</Link></div> : null}
+      </FilterBar>
       {logs.length ? (
         <>
-          <TableShell>
+          <div className="hidden md:block"><TableShell>
             <table className="w-full">
               <thead className="bg-muted/60">
                 <tr>
@@ -117,7 +123,16 @@ export default async function ActivityPage({
                 ))}
               </tbody>
             </table>
-          </TableShell>
+          </TableShell></div>
+          <div className="rounded-lg border bg-card px-4 md:hidden">
+            {logs.map((log) => (
+              <div key={log.id} className="relative border-b py-4 pl-6 last:border-0 before:absolute before:top-5 before:left-0 before:size-2 before:rounded-full before:bg-primary">
+                <p className="text-[13px] leading-5">{log.description}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2"><Badge value={log.action} /><Badge value={log.entityType} /></div>
+                <p className="text-muted-foreground mt-2 flex items-center gap-1 text-[11px]"><span>{log.user?.name ?? "System"}</span><span>·</span><Clock3 className="size-3" />{formatDate(log.createdAt)}</p>
+              </div>
+            ))}
+          </div>
           <Pagination
             page={page}
             totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}

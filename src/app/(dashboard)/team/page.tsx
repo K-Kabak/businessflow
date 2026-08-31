@@ -35,7 +35,7 @@ export default async function TeamPage() {
         title="Team"
         description="Organization members and their current workload."
       />
-      <TableShell>
+      <div className="hidden md:block"><TableShell>
         <table className="w-full">
           <thead className="bg-muted/60">
             <tr>
@@ -67,7 +67,21 @@ export default async function TeamPage() {
             ))}
           </tbody>
         </table>
-      </TableShell>
+      </TableShell></div>
+      <div className="overflow-hidden rounded-lg border bg-card md:hidden">
+        {members.map((member) => (
+          <div key={member.id} className="border-b p-4 last:border-0">
+            <div className="flex items-start gap-3">
+              <Avatar name={member.name} />
+              <div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><p className="font-medium">{member.name}</p><Badge value={member.role} /></div><p className="text-muted-foreground mt-0.5 truncate text-xs">{member.jobTitle ?? "Job title not provided"}</p><p className="text-muted-foreground mt-1 truncate text-xs">{member.email}</p></div>
+            </div>
+            <div className="bg-muted mt-4 grid grid-cols-2 divide-x rounded-md py-2.5 text-center">
+              <div><p className="font-semibold">{member._count.projectMembers}</p><p className="text-muted-foreground text-[11px]">Active projects</p></div>
+              <div><p className="font-semibold">{member._count.assignedTasks}</p><p className="text-muted-foreground text-[11px]">Open tasks</p></div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

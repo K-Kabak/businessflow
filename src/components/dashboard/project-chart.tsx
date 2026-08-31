@@ -3,11 +3,10 @@
 import {
   Bar,
   BarChart,
-  CartesianGrid,
   ResponsiveContainer,
   Tooltip,
-  XAxis,
   YAxis,
+  XAxis,
 } from "recharts";
 
 export function ProjectChart({
@@ -16,31 +15,29 @@ export function ProjectChart({
   data: Array<{ status: string; count: number }>;
 }) {
   return (
-    <div className="h-64 w-full">
+    <div className="h-56 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ left: -20, right: 8, top: 8 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
-          <XAxis
-            dataKey="status"
-            tick={{ fontSize: 11 }}
-            axisLine={false}
-            tickLine={false}
-          />
+        <BarChart data={data} layout="vertical" margin={{ left: 4, right: 24, top: 4, bottom: 4 }}>
+          <XAxis type="number" hide allowDecimals={false} />
           <YAxis
-            allowDecimals={false}
-            tick={{ fontSize: 11 }}
+            type="category"
+            dataKey="status"
+            width={92}
+            tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
             axisLine={false}
             tickLine={false}
           />
           <Tooltip
-            cursor={{ fill: "rgba(99,102,241,.08)" }}
+            cursor={{ fill: "var(--muted)" }}
             contentStyle={{
               borderRadius: 8,
               borderColor: "var(--border)",
-              background: "var(--card)",
+              background: "var(--surface-elevated)",
+              color: "var(--foreground)",
+              fontSize: 12,
             }}
           />
-          <Bar dataKey="count" fill="var(--primary)" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="count" fill="var(--primary)" radius={[0, 4, 4, 0]} barSize={18} />
         </BarChart>
       </ResponsiveContainer>
     </div>

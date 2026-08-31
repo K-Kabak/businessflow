@@ -1,5 +1,5 @@
 import type { Prisma } from "@/generated/prisma/client";
-import { Plus } from "lucide-react";
+import { CheckSquare2, Plus, X } from "lucide-react";
 import Link from "next/link";
 
 import { TaskStatusSelect } from "@/components/tasks/status-select";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/form-controls";
 import {
   EmptyState,
+  FilterBar,
   PageHeader,
   TableShell,
   tdClass,
@@ -110,7 +111,8 @@ export default async function TasksPage({
           ) : undefined
         }
       />
-      <form className="grid gap-3 md:grid-cols-[1fr_repeat(5,140px)_auto]">
+      <FilterBar>
+      <form className="grid gap-2 md:grid-cols-[minmax(220px,1fr)_repeat(5,minmax(118px,140px))_auto]">
         <Input
           name="search"
           defaultValue={search}
@@ -150,15 +152,19 @@ export default async function TasksPage({
           ))}
         </Select>
         <Select name="sort" defaultValue={sort} aria-label="Sort tasks">
-          <option value="createdAt">Created</option>
-          <option value="deadline">Deadline</option>
-          <option value="priority">Priority</option>
+          <option value="createdAt">Sort: Created</option>
+          <option value="deadline">Sort: Deadline</option>
+          <option value="priority">Sort: Priority</option>
         </Select>
-        <Button variant="outline">Apply</Button>
+        <Button variant="secondary">Apply</Button>
       </form>
+      {search || status || priority || projectId || assigneeId ? (
+        <div className="mt-2 flex items-center border-t px-1 pt-2 text-xs"><span className="text-muted-foreground">Filters active</span><Link href="/tasks" className="text-muted-foreground hover:text-foreground ml-auto inline-flex items-center gap-1"><X className="size-3" /> Clear</Link></div>
+      ) : null}
+      </FilterBar>
       {tasks.length ? (
         <>
-          <TableShell>
+          <div className="hidden md:block"><TableShell>
             <table className="w-full">
               <thead className="bg-muted/60">
                 <tr>
@@ -224,7 +230,23 @@ export default async function TasksPage({
                 ))}
               </tbody>
             </table>
-          </TableShell>
+          </TableShell></div>
+          <div className="overflow-hidden rounded-lg border bg-card md:hidden">
+            {tasks.map((task) => (
+              <div key={task.id} className="flex gap-3 border-b p-4 last:border-0">
+                <span className="bg-muted text-muted-foreground grid size-9 shrink-0 place-items-center rounded-md"><CheckSquare2 className="size-4" /></span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2"><p className="font-medium">{task.title}</p>{user.role === "EMPLOYEE" ? <TaskStatusSelect taskId={task.id} value={task.status} /> : <Badge value={task.status} />}</div>
+                  <Link href={`/projects/${task.projectId}`} className="text-muted-foreground mt-1 block truncate text-xs">{task.project.name}</Link>
+                  <div className="text-muted-foreground mt-3 flex items-center justify-between gap-2 text-xs">
+                    <span>{task.assignee ? <span className="flex items-center gap-1.5"><Avatar name={task.assignee.name} size="sm" />{task.assignee.name}</span> : "Unassigned"}</span>
+                    <span className={isOverdue(task.deadline, task.status) ? "text-danger font-medium" : ""}>{formatDate(task.deadline)}</span>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between"><Badge value={task.priority} />{user.role === "ADMIN" ? <Link href={`/tasks/${task.id}/edit`} className="text-primary text-xs font-medium">Edit task</Link> : null}</div>
+                </div>
+              </div>
+            ))}
+          </div>
           <Pagination
             page={page}
             totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}

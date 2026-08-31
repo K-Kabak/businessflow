@@ -1,12 +1,14 @@
 import type { Prisma } from "@/generated/prisma/client";
-import { Plus } from "lucide-react";
+import { BriefcaseBusiness, Plus, X } from "lucide-react";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/form-controls";
 import {
   EmptyState,
+  FilterBar,
   PageHeader,
   TableShell,
   tdClass,
@@ -99,7 +101,8 @@ export default async function ProjectsPage({
           ) : undefined
         }
       />
-      <form className="grid gap-3 md:grid-cols-[1fr_160px_150px_180px_130px_auto]">
+      <FilterBar>
+      <form className="grid gap-2 md:grid-cols-[minmax(220px,1fr)_150px_140px_170px_140px_auto]">
         <Input
           name="search"
           defaultValue={search}
@@ -130,15 +133,19 @@ export default async function ProjectsPage({
           ))}
         </Select>
         <Select name="sort" defaultValue={sort}>
-          <option value="createdAt">Created</option>
-          <option value="deadline">Deadline</option>
-          <option value="status">Status</option>
+          <option value="createdAt">Sort: Created</option>
+          <option value="deadline">Sort: Deadline</option>
+          <option value="status">Sort: Status</option>
         </Select>
-        <Button variant="outline">Apply</Button>
+        <Button variant="secondary">Apply</Button>
       </form>
+      {search || status || priority || clientId ? (
+        <div className="mt-2 flex items-center border-t px-1 pt-2 text-xs"><span className="text-muted-foreground">Filters active</span><Link href="/projects" className="text-muted-foreground hover:text-foreground ml-auto inline-flex items-center gap-1"><X className="size-3" /> Clear</Link></div>
+      ) : null}
+      </FilterBar>
       {projects.length ? (
         <>
-          <TableShell>
+          <div className="hidden md:block"><TableShell>
             <table className="w-full">
               <thead className="bg-muted/60">
                 <tr>
@@ -185,13 +192,36 @@ export default async function ProjectsPage({
                           <span className="text-xs">{progress}%</span>
                         </div>
                       </td>
-                      <td className={tdClass}>{project.members.length}</td>
+                      <td className={tdClass}>
+                        {project.members.length ? (
+                          <div className="flex -space-x-1.5">
+                            {project.members.slice(0, 3).map(({ user }) => <Avatar key={user.name} name={user.name} size="sm" />)}
+                            {project.members.length > 3 ? <span className="bg-muted text-muted-foreground grid size-7 place-items-center rounded-full text-[10px] ring-2 ring-card">+{project.members.length - 3}</span> : null}
+                          </div>
+                        ) : <span className="text-muted-foreground">—</span>}
+                      </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-          </TableShell>
+          </TableShell></div>
+          <div className="overflow-hidden rounded-lg border bg-card md:hidden">
+            {projects.map((project) => {
+              const progress = calculateProjectProgress(project.tasks);
+              return (
+                <Link key={project.id} href={`/projects/${project.id}`} className="flex gap-3 border-b p-4 last:border-0 active:bg-muted">
+                  <span className="bg-muted text-muted-foreground grid size-9 shrink-0 place-items-center rounded-md"><BriefcaseBusiness className="size-4" /></span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-start justify-between gap-2"><span className="font-medium">{project.name}</span><Badge value={project.status} /></span>
+                    <span className="text-muted-foreground mt-1 block text-xs">{project.client.name}</span>
+                    <span className="mt-3 flex items-center gap-2"><span className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full"><span className="bg-primary block h-full" style={{ width: `${progress}%` }} /></span><span className="text-muted-foreground text-[11px]">{progress}%</span></span>
+                    <span className="text-muted-foreground mt-2 flex items-center justify-between text-xs"><Badge value={project.priority} /><span>{formatDate(project.deadline)}</span></span>
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
           <Pagination
             page={page}
             totalPages={totalPages}

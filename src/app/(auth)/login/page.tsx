@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
-import { BriefcaseBusiness } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { LoginForm } from "@/components/auth/login-form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -18,20 +11,15 @@ export default async function LoginPage() {
   const session = await auth();
   if (session?.user) redirect("/dashboard");
   return (
-    <main className="grid min-h-screen place-items-center bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.12),transparent_40%)] p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="items-center pb-2 text-center">
-          <span className="bg-primary text-primary-foreground mb-3 flex size-11 items-center justify-center rounded-xl">
-            <BriefcaseBusiness className="size-5" />
-          </span>
-          <CardTitle className="text-2xl">Welcome to BusinessFlow</CardTitle>
-          <CardDescription>
-            Sign in to manage your organization&apos;s work.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-5">
+    <main className="relative grid min-h-screen place-items-center px-5 py-16">
+      <header className="absolute top-0 right-0 left-0 flex h-16 items-center justify-between px-5 sm:px-8">
+        <div className="flex items-center gap-2.5 font-semibold tracking-[-0.02em]"><span className="bg-foreground text-background grid size-7 place-items-center rounded-md text-[10px] font-bold">BF</span>BusinessFlow</div>
+        <ThemeToggle />
+      </header>
+      <section className="w-full max-w-[380px]">
+          <div className="mb-8"><p className="text-muted-foreground mb-2 text-xs font-medium">Workspace access</p><h1 className="text-2xl font-semibold tracking-[-0.025em]">Welcome back</h1><p className="text-muted-foreground mt-2 text-sm">Sign in to manage your organization&apos;s work.</p></div>
           <LoginForm />
-          <div className="bg-muted text-muted-foreground mt-6 rounded-lg p-3 text-xs">
+          <div className="text-muted-foreground mt-6 border-t pt-5 text-xs">
             <p className="text-foreground font-medium">
               Demo password: Demo123!
             </p>
@@ -39,8 +27,7 @@ export default async function LoginPage() {
               Use either demo account to compare role-based access.
             </p>
           </div>
-        </CardContent>
-      </Card>
+      </section>
     </main>
   );
 }

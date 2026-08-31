@@ -28,11 +28,11 @@ jobs:
       E2E_DATABASE_URL: postgresql://businessflow:businessflow@localhost:5432/businessflow_e2e?schema=public
       AUTH_SECRET: ci-only-businessflow-auth-secret
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with:
           version: 12.1.0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm

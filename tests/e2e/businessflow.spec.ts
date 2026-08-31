@@ -46,7 +46,9 @@ test("admin can create a project and task", async ({ page }) => {
     .selectOption({ label: "E2E Delivery Project" });
   await page.getByRole("button", { name: "Create task" }).click();
   await expect(page).toHaveURL(/\/tasks/);
-  await expect(page.getByText("E2E delivery task")).toBeVisible();
+  await expect(
+    page.getByRole("row").filter({ hasText: "E2E delivery task" }),
+  ).toBeVisible();
 });
 
 test("Kanban move persists after refresh", async ({ page }) => {

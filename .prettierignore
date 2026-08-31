@@ -1,0 +1,6 @@
+PROJECT_SPEC.md
+businessflow-scaffold/
+src/generated/prisma/
+node_modules/
+.next/
+prisma/schema.prisma

@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  EMPLOYEE
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum ProjectPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ActivityEntityType {
+  CLIENT
+  PROJECT
+  TASK
+  USER
+  ORGANIZATION
+}
+
+enum ActivityAction {
+  CREATED
+  UPDATED
+  DELETED
+  STATUS_CHANGED
+  ASSIGNED
+}
+
+model Organization {
+  id             String          @id @default(cuid())
+  name           String
+  slug           String          @unique
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  users          User[]
+  clients        Client[]
+  projects       Project[]
+  projectMembers ProjectMember[]
+  tasks          Task[]
+  activityLogs   ActivityLog[]
+}
+
+model User {
+  id             String          @id @default(cuid())
+  organizationId String
+  name           String
+  email          String          @unique
+  passwordHash   String
+  role           UserRole        @default(EMPLOYEE)
+  avatarUrl      String?
+  jobTitle       String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectMembers ProjectMember[]
+  assignedTasks  Task[]
+  activityLogs   ActivityLog[]
+
+  @@unique([id, organizationId])
+  @@index([organizationId])
+}
+
+model Client {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  email          String?
+  phone          String?
+  company        String?
+  address        String?
+  notes          String?
+  status         ClientStatus @default(ACTIVE)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projects       Project[]
+
+  @@unique([id, organizationId])
+  @@index([organizationId])
+  @@index([organizationId, status])
+}
+
+model Project {
+  id             String          @id @default(cuid())
+  organizationId String
+  clientId       String
+  name           String
+  description    String?
+  status         ProjectStatus   @default(PLANNING)
+  priority       ProjectPriority @default(MEDIUM)
+  budget         Decimal?        @db.Decimal(12, 2)
+  startDate      DateTime?       @db.Date
+  deadline       DateTime?       @db.Date
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client         Client          @relation(fields: [clientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  members        ProjectMember[]
+  tasks          Task[]
+
+  @@unique([id, organizationId])
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([organizationId, status])
+  @@index([organizationId, priority])
+  @@index([deadline])
+}
+
+model ProjectMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  projectId      String
+  userId         String
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project        Project      @relation(fields: [projectId, organizationId], references: [id, organizationId], onDelete: Cascade)
+  user           User         @relation(fields: [userId, organizationId], references: [id, organizationId], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
+model Task {
+  id             String       @id @default(cuid())
+  organizationId String
+  projectId      String
+  assigneeId     String?
+  title          String
+  description    String?
+  status         TaskStatus   @default(TODO)
+  priority       TaskPriority @default(MEDIUM)
+  deadline       DateTime?    @db.Date
+  position       Int          @default(1000)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project        Project      @relation(fields: [projectId, organizationId], references: [id, organizationId], onDelete: Cascade)
+  assignee       User?        @relation(fields: [assigneeId, organizationId], references: [id, organizationId], onDelete: SetNull)
+
+  @@unique([id, organizationId])
+  @@index([organizationId])
+  @@index([projectId])
+  @@index([assigneeId])
+  @@index([organizationId, status, position])
+  @@index([deadline])
+}
+
+model ActivityLog {
+  id             String             @id @default(cuid())
+  organizationId String
+  userId         String?
+  entityType     ActivityEntityType
+  entityId       String?
+  action         ActivityAction
+  description    String
+  metadata       Json?
+  createdAt      DateTime           @default(now())
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, entityType])
+  @@index([userId])
+}

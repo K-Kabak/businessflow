@@ -1,11 +1,14 @@
 import type { Prisma } from "@/generated/prisma/client";
+import type { Metadata } from "next";
 import { KanbanBoard } from "@/components/board/kanban-board";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/form-controls";
-import { EmptyState, PageHeader } from "@/components/ui/page";
+import { EmptyState, FilterBar, PageHeader } from "@/components/ui/page";
 import { projectScope, requireUser, taskScope } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/db";
 import { param, type SearchParams } from "@/lib/search-params";
+
+export const metadata: Metadata = { title: "Board" };
 
 export default async function BoardPage({
   searchParams,
@@ -55,29 +58,46 @@ export default async function BoardPage({
         title="Board"
         description="Drag tasks across stages. Changes persist immediately."
       />
-      <form className="grid gap-3 sm:grid-cols-[220px_220px_auto_auto]">
-        <Select name="project" defaultValue={projectId}>
-          <option value="">All projects</option>
-          {projects.map((project) => (
-            <option key={project.id} value={project.id}>
-              {project.name}
-            </option>
-          ))}
-        </Select>
-        <Select name="assignee" defaultValue={assigneeId} disabled={mine}>
-          <option value="">All assignees</option>
-          {assignees.map((person) => (
-            <option key={person.id} value={person.id}>
-              {person.name}
-            </option>
-          ))}
-        </Select>
-        <label className="bg-card flex h-10 items-center gap-2 rounded-lg border px-3 text-sm">
-          <input type="checkbox" name="mine" value="1" defaultChecked={mine} />
-          My tasks
-        </label>
-        <Button variant="outline">Apply filters</Button>
-      </form>
+      <FilterBar>
+        <form className="grid gap-2 sm:grid-cols-[220px_220px_auto_auto]">
+          <Select
+            name="project"
+            defaultValue={projectId}
+            aria-label="Filter project"
+          >
+            <option value="">All projects</option>
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.name}
+              </option>
+            ))}
+          </Select>
+          <Select
+            name="assignee"
+            defaultValue={assigneeId}
+            disabled={mine}
+            aria-label="Filter assignee"
+          >
+            <option value="">All assignees</option>
+            {assignees.map((person) => (
+              <option key={person.id} value={person.id}>
+                {person.name}
+              </option>
+            ))}
+          </Select>
+          <label className="bg-card hover:border-border-strong flex h-10 items-center gap-2 rounded-md border px-3 text-[13px] max-sm:h-11">
+            <input
+              type="checkbox"
+              name="mine"
+              value="1"
+              defaultChecked={mine}
+              className="accent-primary size-4"
+            />
+            My tasks
+          </label>
+          <Button variant="secondary">Apply filters</Button>
+        </form>
+      </FilterBar>
       {tasks.length ? (
         <KanbanBoard key={boardKey} initialTasks={boardTasks} />
       ) : (

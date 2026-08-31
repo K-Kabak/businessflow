@@ -1,5 +1,4 @@
 import { ProjectForm } from "@/components/forms/resource-forms";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/db";
@@ -24,14 +23,9 @@ export default async function NewProjectPage() {
         title="Create project"
         description="Set the client, scope, timeline, and delivery team."
       />
-      <Card>
-        <CardHeader>
-          <CardTitle>Project details</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className="rounded-lg border bg-card p-5 sm:p-6">
           <ProjectForm clients={clients} members={members} />
-        </CardContent>
-      </Card>
+      </section>
     </div>
   );
 }

@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { DeleteButton } from "@/components/delete-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState, PageHeader } from "@/components/ui/page";
 import { deleteClientAction } from "@/features/actions";
 import { clientScope, requireUser } from "@/lib/auth-helpers";
@@ -45,8 +44,10 @@ export default async function ClientDetailsPage({
         title={client.name}
         description={client.company ?? "Client details"}
         action={
-          user.role === "ADMIN" ? (
-            <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <Badge value={client.status} />
+          {user.role === "ADMIN" ? (
+            <>
               <Button asChild variant="outline">
                 <Link href={`/clients/${client.id}/edit`}>
                   <Edit3 className="size-4" />
@@ -59,53 +60,31 @@ export default async function ClientDetailsPage({
                 action={deleteClientAction.bind(null, client.id)}
                 redirectTo="/clients"
               />
-            </div>
-          ) : undefined
+            </>
+          ) : null}
+          </div>
         }
       />
-      <div className="grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Contact information</CardTitle>
-              <Badge value={client.status} />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm">
-            <p className="flex items-center gap-3">
-              <Mail className="text-muted-foreground size-4" />
-              {client.email ?? "No email"}
-            </p>
-            <p className="flex items-center gap-3">
-              <Phone className="text-muted-foreground size-4" />
-              {client.phone ?? "No phone"}
-            </p>
-            <p className="flex items-start gap-3">
-              <MapPin className="text-muted-foreground mt-0.5 size-4" />
-              {client.address ?? "No address"}
-            </p>
-            <div className="border-t pt-4">
-              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                Notes
-              </p>
-              <p className="mt-2 whitespace-pre-wrap">
-                {client.notes ?? "No notes added."}
-              </p>
-            </div>
-            <p className="text-muted-foreground border-t pt-4 text-xs">
-              Client since {formatDate(client.createdAt)}
-            </p>
-          </CardContent>
-        </Card>
-        <div>
-          <h2 className="mb-3 font-semibold">Projects</h2>
+      <div className="grid overflow-hidden rounded-lg border bg-card lg:grid-cols-[360px_1fr]">
+        <section className="border-b p-5 lg:border-r lg:border-b-0">
+          <h2 className="text-sm font-semibold">Contact information</h2>
+          <dl className="mt-4 space-y-4 text-[13px]">
+            <div className="flex items-start gap-3"><Mail className="text-muted-foreground mt-0.5 size-4" /><div><dt className="text-muted-foreground text-[11px]">Email</dt><dd className="mt-0.5 break-all">{client.email ?? "Not provided"}</dd></div></div>
+            <div className="flex items-start gap-3"><Phone className="text-muted-foreground mt-0.5 size-4" /><div><dt className="text-muted-foreground text-[11px]">Phone</dt><dd className="mt-0.5">{client.phone ?? "Not provided"}</dd></div></div>
+            <div className="flex items-start gap-3"><MapPin className="text-muted-foreground mt-0.5 size-4" /><div><dt className="text-muted-foreground text-[11px]">Address</dt><dd className="mt-0.5">{client.address ?? "Not provided"}</dd></div></div>
+          </dl>
+          <div className="mt-5 border-t pt-5"><p className="text-muted-foreground text-[11px] font-medium">Notes</p><p className="mt-2 text-[13px] leading-6 whitespace-pre-wrap">{client.notes ?? "No notes added."}</p></div>
+          <p className="text-muted-foreground mt-5 border-t pt-4 text-[11px]">Client since {formatDate(client.createdAt)}</p>
+        </section>
+        <section className="p-5">
+          <div className="mb-4 flex items-center justify-between"><h2 className="text-sm font-semibold">Projects</h2><span className="text-muted-foreground text-xs">{client.projects.length} total</span></div>
           {client.projects.length ? (
-            <div className="grid gap-3">
+            <div className="overflow-hidden rounded-md border">
               {client.projects.map((project) => (
                 <Link
                   key={project.id}
                   href={`/projects/${project.id}`}
-                  className="bg-card hover:border-primary/40 rounded-xl border p-4 shadow-sm transition-colors"
+                  className="hover:bg-muted/65 block border-b p-4 transition-colors last:border-0"
                 >
                   <div className="flex items-center justify-between">
                     <p className="font-medium">{project.name}</p>
@@ -124,7 +103,7 @@ export default async function ClientDetailsPage({
               description="This client has no visible projects yet."
             />
           )}
-        </div>
+        </section>
       </div>
     </div>
   );

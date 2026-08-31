@@ -14,6 +14,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/form-controls";
+import { FormSection } from "@/components/ui/page";
 import {
   saveClientAction,
   saveProjectAction,
@@ -85,35 +86,26 @@ export function ClientForm({ initial }: { initial?: ClientInput }) {
     }),
   );
   return (
-    <form onSubmit={submit} className="grid gap-5 sm:grid-cols-2">
-      <Field label="Client name" htmlFor="name" error={errors.name?.message}>
-        <Input id="name" {...register("name")} />
-      </Field>
-      <Field label="Company" htmlFor="company" error={errors.company?.message}>
-        <Input id="company" {...register("company")} />
-      </Field>
-      <Field label="Email" htmlFor="email" error={errors.email?.message}>
-        <Input id="email" type="email" {...register("email")} />
-      </Field>
-      <Field label="Phone" htmlFor="phone" error={errors.phone?.message}>
-        <Input id="phone" {...register("phone")} />
-      </Field>
-      <Field label="Status" htmlFor="status" error={errors.status?.message}>
-        <Select id="status" {...register("status")}>
-          <option value="ACTIVE">Active</option>
-          <option value="INACTIVE">Inactive</option>
-        </Select>
-      </Field>
-      <Field label="Address" htmlFor="address" error={errors.address?.message}>
-        <Input id="address" {...register("address")} />
-      </Field>
-      <div className="sm:col-span-2">
-        <Field label="Notes" htmlFor="notes" error={errors.notes?.message}>
-          <Textarea id="notes" {...register("notes")} />
-        </Field>
-      </div>
+    <form onSubmit={submit}>
+      <FormSection title="Identity" description="The client name and relationship status.">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Client name" htmlFor="name" error={errors.name?.message} required><Input id="name" {...register("name")} /></Field>
+          <Field label="Company" htmlFor="company" error={errors.company?.message}><Input id="company" {...register("company")} /></Field>
+          <Field label="Status" htmlFor="status" error={errors.status?.message}><Select id="status" {...register("status")}><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option></Select></Field>
+        </div>
+      </FormSection>
+      <FormSection title="Contact" description="Primary contact details for this client.">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Email" htmlFor="email" error={errors.email?.message}><Input id="email" type="email" {...register("email")} /></Field>
+          <Field label="Phone" htmlFor="phone" error={errors.phone?.message}><Input id="phone" {...register("phone")} /></Field>
+          <div className="sm:col-span-2"><Field label="Address" htmlFor="address" error={errors.address?.message}><Input id="address" {...register("address")} /></Field></div>
+        </div>
+      </FormSection>
+      <FormSection title="Additional information" description="Internal context visible to your team.">
+        <Field label="Notes" htmlFor="notes" error={errors.notes?.message}><Textarea id="notes" {...register("notes")} /></Field>
+      </FormSection>
       <input type="hidden" {...register("id")} />
-      <div className="flex gap-3 sm:col-span-2">
+      <div className="mt-6 flex flex-col-reverse gap-2 border-t pt-5 sm:flex-row sm:justify-end">
         <SubmitButton
           pending={pending}
           label={initial?.id ? "Save changes" : "Create client"}
@@ -173,102 +165,41 @@ export function ProjectForm({
     }),
   );
   return (
-    <form onSubmit={submit} className="grid gap-5 sm:grid-cols-2">
-      <Field label="Project name" htmlFor="name" error={errors.name?.message}>
-        <Input id="name" {...register("name")} />
-      </Field>
-      <Field label="Client" htmlFor="clientId" error={errors.clientId?.message}>
-        <Select id="clientId" {...register("clientId")}>
-          {clients.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </Select>
-      </Field>
-      <Field label="Status" htmlFor="status" error={errors.status?.message}>
-        <Select id="status" {...register("status")}>
-          <option value="PLANNING">Planning</option>
-          <option value="IN_PROGRESS">In progress</option>
-          <option value="ON_HOLD">On hold</option>
-          <option value="COMPLETED">Completed</option>
-          <option value="CANCELLED">Cancelled</option>
-        </Select>
-      </Field>
-      <Field
-        label="Priority"
-        htmlFor="priority"
-        error={errors.priority?.message}
-      >
-        <Select id="priority" {...register("priority")}>
-          <option value="LOW">Low</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="HIGH">High</option>
-        </Select>
-      </Field>
-      <Field
-        label="Budget (PLN)"
-        htmlFor="budget"
-        error={errors.budget?.message}
-      >
-        <Input
-          id="budget"
-          type="number"
-          min="0"
-          step="0.01"
-          {...register("budget")}
-        />
-      </Field>
-      <div className="grid grid-cols-2 gap-3">
-        <Field
-          label="Start date"
-          htmlFor="startDate"
-          error={errors.startDate?.message}
-        >
-          <Input id="startDate" type="date" {...register("startDate")} />
-        </Field>
-        <Field
-          label="Deadline"
-          htmlFor="deadline"
-          error={errors.deadline?.message}
-        >
-          <Input id="deadline" type="date" {...register("deadline")} />
-        </Field>
-      </div>
-      <div className="sm:col-span-2">
-        <Field
-          label="Description"
-          htmlFor="description"
-          error={errors.description?.message}
-        >
-          <Textarea id="description" {...register("description")} />
-        </Field>
-      </div>
-      <div className="sm:col-span-2">
-        <Field
-          label="Project members"
-          htmlFor="memberIds"
-          error={errors.memberIds?.message as string | undefined}
-        >
-          <select
-            id="memberIds"
-            multiple
-            className="bg-card min-h-32 w-full rounded-lg border p-2 text-sm"
-            {...register("memberIds")}
-          >
+    <form onSubmit={submit}>
+      <FormSection title="Basics" description="Define the project and the client it belongs to.">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Project name" htmlFor="name" error={errors.name?.message} required><Input id="name" {...register("name")} /></Field>
+          <Field label="Client" htmlFor="clientId" error={errors.clientId?.message} required><Select id="clientId" {...register("clientId")}>{clients.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></Field>
+          <div className="sm:col-span-2"><Field label="Description" htmlFor="description" error={errors.description?.message}><Textarea id="description" {...register("description")} /></Field></div>
+        </div>
+      </FormSection>
+      <FormSection title="Delivery" description="Set the current stage and relative urgency.">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Status" htmlFor="status" error={errors.status?.message}><Select id="status" {...register("status")}><option value="PLANNING">Planning</option><option value="IN_PROGRESS">In progress</option><option value="ON_HOLD">On hold</option><option value="COMPLETED">Completed</option><option value="CANCELLED">Cancelled</option></Select></Field>
+          <Field label="Priority" htmlFor="priority" error={errors.priority?.message}><Select id="priority" {...register("priority")}><option value="LOW">Low</option><option value="MEDIUM">Medium</option><option value="HIGH">High</option></Select></Field>
+        </div>
+      </FormSection>
+      <FormSection title="Timeline & budget" description="Optional commercial and scheduling details.">
+        <div className="grid gap-5 sm:grid-cols-3">
+          <Field label="Budget (PLN)" htmlFor="budget" error={errors.budget?.message}><Input id="budget" type="number" min="0" step="0.01" {...register("budget")} /></Field>
+          <Field label="Start date" htmlFor="startDate" error={errors.startDate?.message}><Input id="startDate" type="date" {...register("startDate")} /></Field>
+          <Field label="Deadline" htmlFor="deadline" error={errors.deadline?.message}><Input id="deadline" type="date" {...register("deadline")} /></Field>
+        </div>
+      </FormSection>
+      <FormSection title="Team" description="Select organization members assigned to this project.">
+        <Field label="Project members" htmlFor="memberIds" error={errors.memberIds?.message as string | undefined}>
+          <div id="memberIds" className="grid overflow-hidden rounded-md border sm:grid-cols-2" role="group" aria-label="Project members">
             {members.map((member) => (
-              <option key={member.id} value={member.id}>
-                {member.name} · {member.email}
-              </option>
+              <label key={member.id} className="hover:bg-muted flex min-h-12 cursor-pointer items-center gap-3 border-b px-3 py-2 last:border-0 sm:nth-[odd]:border-r">
+                <input type="checkbox" value={member.id} {...register("memberIds")} className="accent-primary size-4" />
+                <span className="min-w-0"><span className="block text-[13px] font-medium">{member.name}</span><span className="text-muted-foreground block truncate text-[11px]">{member.email}</span></span>
+              </label>
             ))}
-          </select>
-          <p className="text-muted-foreground mt-1 text-xs">
-            Hold Ctrl/Cmd to select multiple members.
-          </p>
+          </div>
         </Field>
-      </div>
+      </FormSection>
       <input type="hidden" {...register("id")} />
-      <div className="flex gap-3 sm:col-span-2">
+      <div className="mt-6 flex flex-col-reverse gap-2 border-t pt-5 sm:flex-row sm:justify-end">
         <SubmitButton
           pending={pending}
           label={initial?.id ? "Save changes" : "Create project"}
@@ -327,80 +258,25 @@ export function TaskForm({
     }),
   );
   return (
-    <form onSubmit={submit} className="grid gap-5 sm:grid-cols-2">
-      <Field label="Task title" htmlFor="title" error={errors.title?.message}>
-        <Input id="title" {...register("title")} />
-      </Field>
-      <Field
-        label="Project"
-        htmlFor="projectId"
-        error={errors.projectId?.message}
-      >
-        <Select
-          id="projectId"
-          {...register("projectId", {
-            onChange: (event) => setProjectId(event.target.value),
-          })}
-        >
-          {projects.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </Select>
-      </Field>
-      <Field
-        label="Assignee"
-        htmlFor="assigneeId"
-        error={errors.assigneeId?.message}
-      >
-        <Select id="assigneeId" {...register("assigneeId")}>
-          <option value="">Unassigned</option>
-          {project?.members.map((member) => (
-            <option key={member.id} value={member.id}>
-              {member.name}
-            </option>
-          ))}
-        </Select>
-      </Field>
-      <Field label="Status" htmlFor="status" error={errors.status?.message}>
-        <Select id="status" {...register("status")}>
-          <option value="TODO">To do</option>
-          <option value="IN_PROGRESS">In progress</option>
-          <option value="REVIEW">Review</option>
-          <option value="DONE">Done</option>
-        </Select>
-      </Field>
-      <Field
-        label="Priority"
-        htmlFor="priority"
-        error={errors.priority?.message}
-      >
-        <Select id="priority" {...register("priority")}>
-          <option value="LOW">Low</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="HIGH">High</option>
-          <option value="URGENT">Urgent</option>
-        </Select>
-      </Field>
-      <Field
-        label="Deadline"
-        htmlFor="deadline"
-        error={errors.deadline?.message}
-      >
-        <Input id="deadline" type="date" {...register("deadline")} />
-      </Field>
-      <div className="sm:col-span-2">
-        <Field
-          label="Description"
-          htmlFor="description"
-          error={errors.description?.message}
-        >
-          <Textarea id="description" {...register("description")} />
-        </Field>
-      </div>
+    <form onSubmit={submit}>
+      <FormSection title="Work details" description="Describe the task and the expected work.">
+        <div className="grid gap-5"><Field label="Task title" htmlFor="title" error={errors.title?.message} required><Input id="title" {...register("title")} /></Field><Field label="Description" htmlFor="description" error={errors.description?.message}><Textarea id="description" {...register("description")} /></Field></div>
+      </FormSection>
+      <FormSection title="Assignment" description="Connect the task to a project and owner.">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Project" htmlFor="projectId" error={errors.projectId?.message} required><Select id="projectId" {...register("projectId", { onChange: (event) => setProjectId(event.target.value) })}>{projects.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></Field>
+          <Field label="Assignee" htmlFor="assigneeId" error={errors.assigneeId?.message}><Select id="assigneeId" {...register("assigneeId")}><option value="">Unassigned</option>{project?.members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</Select></Field>
+        </div>
+      </FormSection>
+      <FormSection title="Schedule" description="Set workflow state, priority, and due date.">
+        <div className="grid gap-5 sm:grid-cols-3">
+          <Field label="Status" htmlFor="status" error={errors.status?.message}><Select id="status" {...register("status")}><option value="TODO">To do</option><option value="IN_PROGRESS">In progress</option><option value="REVIEW">Review</option><option value="DONE">Done</option></Select></Field>
+          <Field label="Priority" htmlFor="priority" error={errors.priority?.message}><Select id="priority" {...register("priority")}><option value="LOW">Low</option><option value="MEDIUM">Medium</option><option value="HIGH">High</option><option value="URGENT">Urgent</option></Select></Field>
+          <Field label="Deadline" htmlFor="deadline" error={errors.deadline?.message}><Input id="deadline" type="date" {...register("deadline")} /></Field>
+        </div>
+      </FormSection>
       <input type="hidden" {...register("id")} />
-      <div className="flex gap-3 sm:col-span-2">
+      <div className="mt-6 flex flex-col-reverse gap-2 border-t pt-5 sm:flex-row sm:justify-end">
         <SubmitButton
           pending={pending}
           label={initial?.id ? "Save changes" : "Create task"}

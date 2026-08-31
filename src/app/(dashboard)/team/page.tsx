@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader, TableShell, tdClass, thClass } from "@/components/ui/page";
 import { requireUser } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/db";
+
+export const metadata: Metadata = { title: "Team" };
 
 export default async function TeamPage() {
   const user = await requireUser();
@@ -35,39 +38,77 @@ export default async function TeamPage() {
         title="Team"
         description="Organization members and their current workload."
       />
-      <TableShell>
-        <table className="w-full">
-          <thead className="bg-muted/60">
-            <tr>
-              <th className={thClass}>Name</th>
-              <th className={thClass}>Email</th>
-              <th className={thClass}>Role</th>
-              <th className={thClass}>Job title</th>
-              <th className={thClass}>Active projects</th>
-              <th className={thClass}>Open tasks</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((member) => (
-              <tr key={member.id} className="hover:bg-muted/30">
-                <td className={tdClass}>
-                  <span className="flex items-center gap-3">
-                    <Avatar name={member.name} />{" "}
-                    <span className="font-medium">{member.name}</span>
-                  </span>
-                </td>
-                <td className={tdClass}>{member.email}</td>
-                <td className={tdClass}>
-                  <Badge value={member.role} />
-                </td>
-                <td className={tdClass}>{member.jobTitle ?? "—"}</td>
-                <td className={tdClass}>{member._count.projectMembers}</td>
-                <td className={tdClass}>{member._count.assignedTasks}</td>
+      <div className="hidden md:block">
+        <TableShell>
+          <table className="w-full">
+            <caption className="sr-only">
+              Organization team members and workload
+            </caption>
+            <thead className="bg-muted/60">
+              <tr>
+                <th className={thClass}>Name</th>
+                <th className={thClass}>Email</th>
+                <th className={thClass}>Role</th>
+                <th className={thClass}>Job title</th>
+                <th className={thClass}>Active projects</th>
+                <th className={thClass}>Open tasks</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </TableShell>
+            </thead>
+            <tbody>
+              {members.map((member) => (
+                <tr key={member.id} className="hover:bg-muted/30">
+                  <td className={tdClass}>
+                    <span className="flex items-center gap-3">
+                      <Avatar name={member.name} />{" "}
+                      <span className="font-medium">{member.name}</span>
+                    </span>
+                  </td>
+                  <td className={tdClass}>{member.email}</td>
+                  <td className={tdClass}>
+                    <Badge value={member.role} />
+                  </td>
+                  <td className={tdClass}>{member.jobTitle ?? "—"}</td>
+                  <td className={tdClass}>{member._count.projectMembers}</td>
+                  <td className={tdClass}>{member._count.assignedTasks}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </TableShell>
+      </div>
+      <div className="bg-card overflow-hidden rounded-lg border md:hidden">
+        {members.map((member) => (
+          <div key={member.id} className="border-b p-4 last:border-0">
+            <div className="flex items-start gap-3">
+              <Avatar name={member.name} />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium">{member.name}</p>
+                  <Badge value={member.role} />
+                </div>
+                <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                  {member.jobTitle ?? "Job title not provided"}
+                </p>
+                <p className="text-muted-foreground mt-1 truncate text-xs">
+                  {member.email}
+                </p>
+              </div>
+            </div>
+            <div className="bg-muted mt-4 grid grid-cols-2 divide-x rounded-md py-2.5 text-center">
+              <div>
+                <p className="font-semibold">{member._count.projectMembers}</p>
+                <p className="text-muted-foreground text-[11px]">
+                  Active projects
+                </p>
+              </div>
+              <div>
+                <p className="font-semibold">{member._count.assignedTasks}</p>
+                <p className="text-muted-foreground text-[11px]">Open tasks</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

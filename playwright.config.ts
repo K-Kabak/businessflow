@@ -12,9 +12,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   webServer: {
-    command: process.env.PLAYWRIGHT_PRODUCTION
-      ? "corepack pnpm start"
-      : "corepack pnpm dev",
+    command: process.env.PLAYWRIGHT_PRODUCTION ? "pnpm start" : "pnpm dev",
     url: "http://127.0.0.1:3000/login",
     reuseExistingServer: !process.env.CI,
     env: {

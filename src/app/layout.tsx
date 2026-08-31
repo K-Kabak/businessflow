@@ -33,7 +33,15 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <Toaster richColors position="top-right" />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              classNames: {
+                toast: "!bg-surface-elevated !border-border !text-foreground !rounded-lg !shadow-lg",
+                description: "!text-muted-foreground",
+              },
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

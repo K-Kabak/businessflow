@@ -39,7 +39,7 @@ export function LoginForm() {
     }),
   );
   return (
-    <form onSubmit={submit} className="space-y-5">
+    <form onSubmit={submit} className="space-y-4">
       <Field label="Email" htmlFor="email" error={errors.email?.message}>
         <Input
           id="email"
@@ -68,7 +68,7 @@ export function LoginForm() {
         )}
         Sign in
       </Button>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 border-t pt-4">
         <Button
           type="button"
           variant="outline"

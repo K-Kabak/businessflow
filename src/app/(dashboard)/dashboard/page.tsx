@@ -4,17 +4,10 @@ import {
   BriefcaseBusiness,
   Building2,
   CheckSquare2,
+  Clock3,
 } from "lucide-react";
 
 import { ProjectChart } from "@/components/dashboard/project-chart";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
 import { activityScope } from "@/lib/activity-scope";
 import {
@@ -24,7 +17,7 @@ import {
   clientScope,
 } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/db";
-import { formatDate, humanize } from "@/lib/format";
+import { formatDate, humanize, relativeDeadline } from "@/lib/format";
 import { isOverdue, startOfTodayUtc } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -104,60 +97,79 @@ export default async function DashboardPage() {
             : "Here is the latest across your assigned work."
         }
       />
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {metrics.map(({ label, value, icon: Icon }) => (
-          <Card key={label}>
-            <CardContent className="flex items-center justify-between p-5">
+      <section className="bg-card grid overflow-hidden rounded-lg border sm:grid-cols-2 xl:grid-cols-4">
+        {metrics.map(({ label, value, icon: Icon }) => {
+          const danger = label === "Overdue tasks" && value > 0;
+          return (
+            <div
+              key={label}
+              className="flex min-h-28 items-center justify-between border-b p-5 last:border-b-0 sm:nth-[odd]:border-r sm:nth-last-[-n+2]:border-b-0 xl:border-r xl:border-b-0 xl:last:border-r-0"
+            >
               <div>
-                <p className="text-muted-foreground text-sm">{label}</p>
-                <p className="mt-2 text-3xl font-semibold">{value}</p>
+                <p className="text-muted-foreground text-xs font-medium">
+                  {label}
+                </p>
+                <p
+                  className={`mt-2 text-[28px] leading-8 font-semibold tracking-[-0.03em] ${danger ? "text-danger" : ""}`}
+                >
+                  {value}
+                </p>
               </div>
-              <span className="grid size-10 place-items-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
-                <Icon className="size-5" />
+              <span
+                className={`grid size-9 place-items-center rounded-md ${danger ? "text-danger bg-red-500/9" : "bg-muted text-muted-foreground"}`}
+              >
+                <Icon className="size-4" strokeWidth={1.8} />
               </span>
-            </CardContent>
-          </Card>
-        ))}
+            </div>
+          );
+        })}
       </section>
-      <section className="grid gap-6 xl:grid-cols-[1.2fr_.8fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle>Project status</CardTitle>
-            <CardDescription>
-              Current distribution of visible projects.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ProjectChart
-              data={groups.map((item) => ({
-                status: humanize(item.status),
-                count: item._count._all,
-              }))}
-            />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming deadlines</CardTitle>
-            <CardDescription>Nearest open task due dates.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-1">
+      <section className="bg-card grid overflow-hidden rounded-lg border xl:grid-cols-[1.45fr_.85fr]">
+        <div className="border-b p-5 xl:border-r xl:border-b-0">
+          <div className="mb-4">
+            <h2 className="text-base font-semibold">Project distribution</h2>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Visible projects grouped by delivery stage.
+            </p>
+          </div>
+          <ProjectChart
+            data={groups.map((item) => ({
+              status: humanize(item.status),
+              count: item._count._all,
+            }))}
+          />
+        </div>
+        <div className="p-5">
+          <div className="mb-4">
+            <h2 className="text-base font-semibold">Upcoming deadlines</h2>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Nearest open task due dates.
+            </p>
+          </div>
+          <div>
             {deadlines.length ? (
               deadlines.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center justify-between gap-3 border-b py-3 last:border-0"
+                  className="flex items-start justify-between gap-3 border-b py-3.5 last:border-0"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{task.title}</p>
+                    <p className="truncate text-[13px] font-medium">
+                      {task.title}
+                    </p>
                     <p className="text-muted-foreground truncate text-xs">
                       {task.project.name}
                     </p>
                   </div>
                   <span
-                    className={`text-xs font-medium ${isOverdue(task.deadline, task.status) ? "text-danger" : "text-muted-foreground"}`}
+                    className={`shrink-0 text-right text-[11px] font-medium ${isOverdue(task.deadline, task.status) ? "text-danger" : "text-muted-foreground"}`}
                   >
-                    {formatDate(task.deadline)}
+                    <span className="block" data-visual-dynamic>
+                      {relativeDeadline(task.deadline)}
+                    </span>
+                    <span className="mt-0.5 block font-normal">
+                      {formatDate(task.deadline)}
+                    </span>
                   </span>
                 </div>
               ))
@@ -166,32 +178,33 @@ export default async function DashboardPage() {
                 No upcoming deadlines.
               </p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </section>
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent activity</CardTitle>
-          <CardDescription>Latest changes within your access.</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <section className="bg-card rounded-lg border">
+        <div className="border-b px-5 py-4">
+          <h2 className="text-base font-semibold">Recent activity</h2>
+          <p className="text-muted-foreground mt-1 text-xs">
+            Latest changes within your access.
+          </p>
+        </div>
+        <div className="px-5">
           {activity.length ? (
-            <div className="divide-y">
+            <div>
               {activity.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-start justify-between gap-4 py-3"
+                  className="before:border-primary before:bg-card relative flex items-start justify-between gap-4 border-b py-4 pl-7 before:absolute before:top-[22px] before:left-1.5 before:size-2 before:rounded-full before:border-2 last:border-0"
                 >
                   <div>
-                    <p className="text-sm">{item.description}</p>
-                    <div className="mt-1 flex items-center gap-2">
-                      <Badge value={item.entityType} />
-                      <span className="text-muted-foreground text-xs">
-                        {item.user?.name ?? "System"}
-                      </span>
-                    </div>
+                    <p className="text-[13px]">{item.description}</p>
+                    <p className="text-muted-foreground mt-1 text-[11px]">
+                      {humanize(item.entityType)} ·{" "}
+                      {item.user?.name ?? "System"}
+                    </p>
                   </div>
-                  <time className="text-muted-foreground text-xs whitespace-nowrap">
+                  <time className="text-muted-foreground flex items-center gap-1 text-[11px] whitespace-nowrap">
+                    <Clock3 className="size-3" />
                     {formatDate(item.createdAt)}
                   </time>
                 </div>
@@ -202,8 +215,8 @@ export default async function DashboardPage() {
               No activity yet.
             </p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   );
 }

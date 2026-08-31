@@ -1,9 +1,13 @@
 import type { Prisma } from "@/generated/prisma/client";
+import type { Metadata } from "next";
+import { Clock3, X } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/form-controls";
 import {
   EmptyState,
+  FilterBar,
   PageHeader,
   TableShell,
   tdClass,
@@ -20,6 +24,8 @@ import {
   param,
   type SearchParams,
 } from "@/lib/search-params";
+
+export const metadata: Metadata = { title: "Activity" };
 
 export default async function ActivityPage({
   searchParams,
@@ -69,55 +75,95 @@ export default async function ActivityPage({
         title="Activity"
         description="A read-only audit trail for the work you can access."
       />
-      <form className="grid gap-3 sm:grid-cols-[200px_220px_auto]">
-        <Select name="entity" defaultValue={entity}>
-          <option value="">All entities</option>
-          {validEntities.map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </Select>
-        <Select name="user" defaultValue={actor}>
-          <option value="">All actors</option>
-          {users.map((person) => (
-            <option key={person.id} value={person.id}>
-              {person.name}
-            </option>
-          ))}
-        </Select>
-        <Button variant="outline">Apply filters</Button>
-      </form>
+      <FilterBar>
+        <form className="grid gap-2 sm:grid-cols-[200px_220px_auto]">
+          <Select
+            name="entity"
+            defaultValue={entity}
+            aria-label="Filter entity type"
+          >
+            <option value="">All entities</option>
+            {validEntities.map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </Select>
+          <Select name="user" defaultValue={actor} aria-label="Filter actor">
+            <option value="">All actors</option>
+            {users.map((person) => (
+              <option key={person.id} value={person.id}>
+                {person.name}
+              </option>
+            ))}
+          </Select>
+          <Button variant="secondary">Apply filters</Button>
+        </form>
+        {entity || actor ? (
+          <div className="mt-2 flex items-center border-t px-1 pt-2 text-xs">
+            <span className="text-muted-foreground">Filters active</span>
+            <Link
+              href="/activity"
+              className="text-muted-foreground hover:text-foreground ml-auto inline-flex items-center gap-1"
+            >
+              <X className="size-3" /> Clear
+            </Link>
+          </div>
+        ) : null}
+      </FilterBar>
       {logs.length ? (
         <>
-          <TableShell>
-            <table className="w-full">
-              <thead className="bg-muted/60">
-                <tr>
-                  <th className={thClass}>Actor</th>
-                  <th className={thClass}>Action</th>
-                  <th className={thClass}>Description</th>
-                  <th className={thClass}>Entity</th>
-                  <th className={thClass}>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-muted/30">
-                    <td className={tdClass}>{log.user?.name ?? "System"}</td>
-                    <td className={tdClass}>
-                      <Badge value={log.action} />
-                    </td>
-                    <td className={tdClass}>{log.description}</td>
-                    <td className={tdClass}>
-                      <Badge value={log.entityType} />
-                    </td>
-                    <td className={tdClass}>{formatDate(log.createdAt)}</td>
+          <div className="hidden md:block">
+            <TableShell>
+              <table className="w-full">
+                <caption className="sr-only">Workspace activity log</caption>
+                <thead className="bg-muted/60">
+                  <tr>
+                    <th className={thClass}>Actor</th>
+                    <th className={thClass}>Action</th>
+                    <th className={thClass}>Description</th>
+                    <th className={thClass}>Entity</th>
+                    <th className={thClass}>Date</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </TableShell>
+                </thead>
+                <tbody>
+                  {logs.map((log) => (
+                    <tr key={log.id} className="hover:bg-muted/30">
+                      <td className={tdClass}>{log.user?.name ?? "System"}</td>
+                      <td className={tdClass}>
+                        <Badge value={log.action} />
+                      </td>
+                      <td className={tdClass}>{log.description}</td>
+                      <td className={tdClass}>
+                        <Badge value={log.entityType} />
+                      </td>
+                      <td className={tdClass}>{formatDate(log.createdAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </TableShell>
+          </div>
+          <div className="bg-card rounded-lg border px-4 md:hidden">
+            {logs.map((log) => (
+              <div
+                key={log.id}
+                className="before:bg-primary relative border-b py-4 pl-6 before:absolute before:top-5 before:left-0 before:size-2 before:rounded-full last:border-0"
+              >
+                <p className="text-[13px] leading-5">{log.description}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <Badge value={log.action} />
+                  <Badge value={log.entityType} />
+                </div>
+                <p className="text-muted-foreground mt-2 flex items-center gap-1 text-[11px]">
+                  <span>{log.user?.name ?? "System"}</span>
+                  <span>·</span>
+                  <Clock3 className="size-3" />
+                  {formatDate(log.createdAt)}
+                </p>
+              </div>
+            ))}
+          </div>
           <Pagination
             page={page}
             totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}

@@ -34,6 +34,14 @@ BusinessFlow is a portfolio-grade B2B SaaS application for running a small servi
 | ----------------------------------------------------- | --------------------------------------------------------- |
 | ![BusinessFlow clients](docs/screenshots/clients.png) | ![BusinessFlow Kanban board](docs/screenshots/kanban.png) |
 
+| Dark dashboard                                                      | Dark Kanban                                                   |
+| ------------------------------------------------------------------- | ------------------------------------------------------------- |
+| ![BusinessFlow dark dashboard](docs/screenshots/dashboard-dark.png) | ![BusinessFlow dark Kanban](docs/screenshots/kanban-dark.png) |
+
+| Mobile clients                                                      | Mobile Kanban                                                     |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| ![BusinessFlow mobile clients](docs/screenshots/clients-mobile.png) | ![BusinessFlow mobile Kanban](docs/screenshots/kanban-mobile.png) |
+
 ## Demo Accounts
 
 | Role     | Email                         | Password   |

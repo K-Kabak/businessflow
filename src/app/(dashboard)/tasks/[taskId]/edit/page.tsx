@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { DeleteButton } from "@/components/delete-button";
 import { TaskForm } from "@/components/forms/resource-forms";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
 import { deleteTaskAction } from "@/features/actions";
 import { requireAdmin } from "@/lib/auth-helpers";
@@ -37,20 +36,8 @@ export default async function EditTaskPage({
       <PageHeader
         title={`Edit ${task.title}`}
         description="Update task details, ownership, and status."
-        action={
-          <DeleteButton
-            label={`Delete ${task.title}?`}
-            description="This permanently removes the task while preserving its title in the activity log."
-            action={deleteTaskAction.bind(null, task.id)}
-            redirectTo="/tasks"
-          />
-        }
       />
-      <Card>
-        <CardHeader>
-          <CardTitle>Task details</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className="rounded-lg border bg-card p-5 sm:p-6">
           <TaskForm
             initial={{
               id: task.id,
@@ -68,8 +55,11 @@ export default async function EditTaskPage({
               members: project.members.map((member) => member.user),
             }))}
           />
-        </CardContent>
-      </Card>
+      </section>
+      <section className="flex flex-col gap-4 rounded-lg border border-red-500/25 bg-red-500/[0.03] p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div><h2 className="text-sm font-semibold">Delete task</h2><p className="text-muted-foreground mt-1 text-xs">Permanently remove this task while preserving its title in the activity log.</p></div>
+        <DeleteButton label={`Delete ${task.title}?`} description="This permanently removes the task while preserving its title in the activity log." action={deleteTaskAction.bind(null, task.id)} redirectTo="/tasks" />
+      </section>
     </div>
   );
 }

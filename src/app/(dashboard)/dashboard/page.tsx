@@ -101,34 +101,50 @@ export default async function DashboardPage() {
         {metrics.map(({ label, value, icon: Icon }) => {
           const danger = label === "Overdue tasks" && value > 0;
           return (
-          <div key={label} className="flex min-h-28 items-center justify-between border-b p-5 last:border-b-0 sm:nth-[odd]:border-r sm:nth-last-[-n+2]:border-b-0 xl:border-r xl:border-b-0 xl:last:border-r-0">
+            <div
+              key={label}
+              className="flex min-h-28 items-center justify-between border-b p-5 last:border-b-0 sm:nth-[odd]:border-r sm:nth-last-[-n+2]:border-b-0 xl:border-r xl:border-b-0 xl:last:border-r-0"
+            >
               <div>
-                <p className="text-muted-foreground text-xs font-medium">{label}</p>
-                <p className={`mt-2 text-[28px] leading-8 font-semibold tracking-[-0.03em] ${danger ? "text-danger" : ""}`}>{value}</p>
+                <p className="text-muted-foreground text-xs font-medium">
+                  {label}
+                </p>
+                <p
+                  className={`mt-2 text-[28px] leading-8 font-semibold tracking-[-0.03em] ${danger ? "text-danger" : ""}`}
+                >
+                  {value}
+                </p>
               </div>
-              <span className={`grid size-9 place-items-center rounded-md ${danger ? "bg-red-500/9 text-danger" : "bg-muted text-muted-foreground"}`}>
+              <span
+                className={`grid size-9 place-items-center rounded-md ${danger ? "text-danger bg-red-500/9" : "bg-muted text-muted-foreground"}`}
+              >
                 <Icon className="size-4" strokeWidth={1.8} />
               </span>
-          </div>
-        )})}
+            </div>
+          );
+        })}
       </section>
-      <section className="grid overflow-hidden rounded-lg border bg-card xl:grid-cols-[1.45fr_.85fr]">
+      <section className="bg-card grid overflow-hidden rounded-lg border xl:grid-cols-[1.45fr_.85fr]">
         <div className="border-b p-5 xl:border-r xl:border-b-0">
           <div className="mb-4">
             <h2 className="text-base font-semibold">Project distribution</h2>
-            <p className="text-muted-foreground mt-1 text-xs">Visible projects grouped by delivery stage.</p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Visible projects grouped by delivery stage.
+            </p>
           </div>
-            <ProjectChart
-              data={groups.map((item) => ({
-                status: humanize(item.status),
-                count: item._count._all,
-              }))}
-            />
+          <ProjectChart
+            data={groups.map((item) => ({
+              status: humanize(item.status),
+              count: item._count._all,
+            }))}
+          />
         </div>
         <div className="p-5">
           <div className="mb-4">
             <h2 className="text-base font-semibold">Upcoming deadlines</h2>
-            <p className="text-muted-foreground mt-1 text-xs">Nearest open task due dates.</p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Nearest open task due dates.
+            </p>
           </div>
           <div>
             {deadlines.length ? (
@@ -138,14 +154,22 @@ export default async function DashboardPage() {
                   className="flex items-start justify-between gap-3 border-b py-3.5 last:border-0"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-[13px] font-medium">{task.title}</p>
+                    <p className="truncate text-[13px] font-medium">
+                      {task.title}
+                    </p>
                     <p className="text-muted-foreground truncate text-xs">
                       {task.project.name}
                     </p>
                   </div>
-                  <span className={`shrink-0 text-right text-[11px] font-medium ${isOverdue(task.deadline, task.status) ? "text-danger" : "text-muted-foreground"}`}>
-                    <span className="block">{relativeDeadline(task.deadline)}</span>
-                    <span className="mt-0.5 block font-normal">{formatDate(task.deadline)}</span>
+                  <span
+                    className={`shrink-0 text-right text-[11px] font-medium ${isOverdue(task.deadline, task.status) ? "text-danger" : "text-muted-foreground"}`}
+                  >
+                    <span className="block" data-visual-dynamic>
+                      {relativeDeadline(task.deadline)}
+                    </span>
+                    <span className="mt-0.5 block font-normal">
+                      {formatDate(task.deadline)}
+                    </span>
                   </span>
                 </div>
               ))
@@ -157,10 +181,12 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
-      <section className="rounded-lg border bg-card">
+      <section className="bg-card rounded-lg border">
         <div className="border-b px-5 py-4">
           <h2 className="text-base font-semibold">Recent activity</h2>
-          <p className="text-muted-foreground mt-1 text-xs">Latest changes within your access.</p>
+          <p className="text-muted-foreground mt-1 text-xs">
+            Latest changes within your access.
+          </p>
         </div>
         <div className="px-5">
           {activity.length ? (
@@ -168,11 +194,14 @@ export default async function DashboardPage() {
               {activity.map((item) => (
                 <div
                   key={item.id}
-                  className="relative flex items-start justify-between gap-4 border-b py-4 pl-7 last:border-0 before:absolute before:top-[22px] before:left-1.5 before:size-2 before:rounded-full before:border-2 before:border-primary before:bg-card"
+                  className="before:border-primary before:bg-card relative flex items-start justify-between gap-4 border-b py-4 pl-7 before:absolute before:top-[22px] before:left-1.5 before:size-2 before:rounded-full before:border-2 last:border-0"
                 >
                   <div>
                     <p className="text-[13px]">{item.description}</p>
-                    <p className="text-muted-foreground mt-1 text-[11px]">{humanize(item.entityType)} · {item.user?.name ?? "System"}</p>
+                    <p className="text-muted-foreground mt-1 text-[11px]">
+                      {humanize(item.entityType)} ·{" "}
+                      {item.user?.name ?? "System"}
+                    </p>
                   </div>
                   <time className="text-muted-foreground flex items-center gap-1 text-[11px] whitespace-nowrap">
                     <Clock3 className="size-3" />

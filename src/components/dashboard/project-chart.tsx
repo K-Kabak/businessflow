@@ -17,7 +17,11 @@ export function ProjectChart({
   return (
     <div className="h-56 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} layout="vertical" margin={{ left: 4, right: 24, top: 4, bottom: 4 }}>
+        <BarChart
+          data={data}
+          layout="vertical"
+          margin={{ left: 4, right: 24, top: 4, bottom: 4 }}
+        >
           <XAxis type="number" hide allowDecimals={false} />
           <YAxis
             type="category"
@@ -37,7 +41,13 @@ export function ProjectChart({
               fontSize: 12,
             }}
           />
-          <Bar dataKey="count" fill="var(--primary)" radius={[0, 4, 4, 0]} barSize={18} />
+          <Bar
+            dataKey="count"
+            fill="var(--primary)"
+            radius={[0, 4, 4, 0]}
+            barSize={18}
+            isAnimationActive={false}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

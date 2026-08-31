@@ -1,8 +1,11 @@
 import type {
   InputHTMLAttributes,
+  ReactElement,
+  ReactNode,
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from "react";
+import { cloneElement, isValidElement } from "react";
 import { cn } from "@/lib/utils";
 
 const fieldClass =
@@ -27,7 +30,7 @@ export function Textarea({
   return (
     <textarea
       className={cn(
-        "bg-card placeholder:text-muted-foreground/75 min-h-28 w-full rounded-md border px-3 py-2.5 text-sm leading-5 transition-colors hover:border-border-strong focus-visible:border-primary focus-visible:outline-2",
+        "bg-card placeholder:text-muted-foreground/75 hover:border-border-strong focus-visible:border-primary min-h-28 w-full rounded-md border px-3 py-2.5 text-sm leading-5 transition-colors focus-visible:outline-2",
         className,
       )}
       {...props}
@@ -48,20 +51,45 @@ export function Field({
   error?: string;
   description?: string;
   required?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
+  const descriptionId = description ? `${htmlFor}-description` : undefined;
+  const errorId = error ? `${htmlFor}-error` : undefined;
+  const describedBy =
+    [descriptionId, errorId].filter(Boolean).join(" ") || undefined;
+  const control = isValidElement(children)
+    ? cloneElement(
+        children as ReactElement<{
+          "aria-describedby"?: string;
+          "aria-invalid"?: boolean;
+        }>,
+        {
+          "aria-describedby": describedBy,
+          "aria-invalid": Boolean(error) || undefined,
+        },
+      )
+    : children;
   return (
     <div className="space-y-1.5">
       <label className="text-[13px] font-medium" htmlFor={htmlFor}>
         {label}
-        {required ? <span className="text-danger ml-1" aria-hidden="true">*</span> : null}
+        {required ? (
+          <span className="text-danger ml-1" aria-hidden="true">
+            *
+          </span>
+        ) : null}
       </label>
       {description ? (
-        <p className="text-muted-foreground text-xs leading-4">{description}</p>
+        <p
+          id={descriptionId}
+          className="text-muted-foreground text-xs leading-4"
+        >
+          {description}
+        </p>
       ) : null}
-      {children}
+      {control}
       {error ? (
-        <p className="text-danger text-xs" role="alert">
+        <p id={errorId} className="text-danger text-xs" role="alert">
           {error}
         </p>
       ) : null}

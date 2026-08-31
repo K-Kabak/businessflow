@@ -22,7 +22,10 @@ export function Pagination({
     return `${path}?${query.toString()}`;
   };
   return (
-    <nav className="text-muted-foreground flex items-center justify-between pt-4 text-xs" aria-label="Pagination">
+    <nav
+      className="text-muted-foreground flex items-center justify-between pt-4 text-xs"
+      aria-label="Pagination"
+    >
       <span>
         Page {page} of {totalPages}
       </span>
@@ -33,7 +36,13 @@ export function Pagination({
           size="sm"
           className={page <= 1 ? "pointer-events-none opacity-50" : ""}
         >
-          <Link href={href(page - 1)}>Previous</Link>
+          <Link
+            href={href(page - 1)}
+            aria-disabled={page <= 1}
+            tabIndex={page <= 1 ? -1 : undefined}
+          >
+            Previous
+          </Link>
         </Button>
         <Button
           asChild
@@ -41,7 +50,13 @@ export function Pagination({
           size="sm"
           className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
         >
-          <Link href={href(page + 1)}>Next</Link>
+          <Link
+            href={href(page + 1)}
+            aria-disabled={page >= totalPages}
+            tabIndex={page >= totalPages ? -1 : undefined}
+          >
+            Next
+          </Link>
         </Button>
       </div>
     </nav>

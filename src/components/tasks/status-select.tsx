@@ -26,7 +26,7 @@ export function TaskStatusSelect({
           else toast.error(result.message);
         });
       }}
-      className="bg-card h-8 rounded-lg border px-2 text-xs"
+      className="bg-card hover:border-border-strong disabled:bg-muted h-8 rounded-md border px-2 text-xs transition-colors"
     >
       <option value="TODO">To do</option>
       <option value="IN_PROGRESS">In progress</option>

@@ -22,7 +22,7 @@ export function Pagination({
     return `${path}?${query.toString()}`;
   };
   return (
-    <div className="text-muted-foreground flex items-center justify-between pt-4 text-sm">
+    <nav className="text-muted-foreground flex items-center justify-between pt-4 text-xs" aria-label="Pagination">
       <span>
         Page {page} of {totalPages}
       </span>
@@ -44,6 +44,6 @@ export function Pagination({
           <Link href={href(page + 1)}>Next</Link>
         </Button>
       </div>
-    </div>
+    </nav>
   );
 }

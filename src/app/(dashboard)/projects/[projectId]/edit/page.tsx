@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { ProjectForm } from "@/components/forms/resource-forms";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/db";
@@ -36,11 +35,7 @@ export default async function EditProjectPage({
         title={`Edit ${project.name}`}
         description="Update project scope, timing, and team."
       />
-      <Card>
-        <CardHeader>
-          <CardTitle>Project details</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className="rounded-lg border bg-card p-5 sm:p-6">
           <ProjectForm
             clients={clients}
             members={members}
@@ -57,8 +52,7 @@ export default async function EditProjectPage({
               memberIds: project.members.map((member) => member.userId),
             }}
           />
-        </CardContent>
-      </Card>
+      </section>
     </div>
   );
 }

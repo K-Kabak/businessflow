@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { ClientForm } from "@/components/forms/resource-forms";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/db";
@@ -22,11 +21,7 @@ export default async function EditClientPage({
         title={`Edit ${client.name}`}
         description="Update client details and status."
       />
-      <Card>
-        <CardHeader>
-          <CardTitle>Client details</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className="rounded-lg border bg-card p-5 sm:p-6">
           <ClientForm
             initial={{
               id: client.id,
@@ -39,8 +34,7 @@ export default async function EditClientPage({
               status: client.status,
             }}
           />
-        </CardContent>
-      </Card>
+      </section>
     </div>
   );
 }

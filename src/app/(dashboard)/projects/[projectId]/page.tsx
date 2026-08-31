@@ -6,7 +6,6 @@ import { ProjectTabs } from "@/components/projects/project-tabs";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
 import { deleteProjectAction } from "@/features/actions";
 import { projectScope, requireUser } from "@/lib/auth-helpers";
@@ -61,8 +60,10 @@ export default async function ProjectDetailsPage({
         title={project.name}
         description={`For ${project.client.name}`}
         action={
-          user.role === "ADMIN" ? (
-            <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <Badge value={project.status} />
+          {user.role === "ADMIN" ? (
+            <>
               <Button asChild variant="outline">
                 <Link href={`/projects/${project.id}/edit`}>
                   <Edit3 className="size-4" />
@@ -75,52 +76,25 @@ export default async function ProjectDetailsPage({
                 action={deleteProjectAction.bind(null, project.id)}
                 redirectTo="/projects"
               />
-            </div>
-          ) : undefined
+            </>
+          ) : null}
+          </div>
         }
       />
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-muted-foreground text-xs">Status</p>
-            <div className="mt-2">
-              <Badge value={project.status} />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-muted-foreground text-xs">Progress</p>
-            <p className="mt-2 text-2xl font-semibold">{progress}%</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-muted-foreground flex items-center gap-2 text-xs">
-              <CalendarDays className="size-3" />
-              Deadline
-            </p>
-            <p className="mt-2 font-medium">{formatDate(project.deadline)}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-muted-foreground flex items-center gap-2 text-xs">
-              <WalletCards className="size-3" />
-              Budget
-            </p>
-            <p className="mt-2 font-medium">{formatMoney(project.budget)}</p>
-          </CardContent>
-        </Card>
+      <section className="bg-card grid overflow-hidden rounded-lg border sm:grid-cols-3">
+        <div className="border-b p-5 sm:border-r sm:border-b-0">
+          <p className="text-muted-foreground text-xs">Progress</p><div className="mt-2 flex items-center gap-3"><p className="text-2xl font-semibold tracking-tight">{progress}%</p><div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full"><div className="bg-primary h-full" style={{ width: `${progress}%` }} /></div></div>
+        </div>
+        <div className="border-b p-5 sm:border-r sm:border-b-0"><p className="text-muted-foreground flex items-center gap-2 text-xs"><CalendarDays className="size-3.5" /> Deadline</p><p className="mt-2 font-medium">{formatDate(project.deadline)}</p></div>
+        <div className="p-5"><p className="text-muted-foreground flex items-center gap-2 text-xs"><WalletCards className="size-3.5" /> Budget</p><p className="mt-2 font-medium">{formatMoney(project.budget)}</p></div>
       </section>
-      <Card>
-        <CardContent className="p-5">
-          <div className="mb-5 flex flex-wrap items-center gap-3">
-            <span className="text-sm font-medium">Team</span>
+      <section className="overflow-hidden rounded-lg border bg-card">
+          <div className="flex flex-wrap items-center gap-3 border-b px-5 py-4">
+            <span className="mr-1 text-sm font-semibold">Project team</span>
             {project.members.map(({ user: member }) => (
               <div
                 key={member.id}
-                className="flex items-center gap-2 rounded-full border py-1 pr-3 pl-1 text-xs"
+                className="bg-muted/60 flex items-center gap-2 rounded-full py-1 pr-3 pl-1 text-xs"
               >
                 <Avatar name={member.name} size="sm" />
                 {member.name}
@@ -132,7 +106,7 @@ export default async function ProjectDetailsPage({
               </span>
             ) : null}
           </div>
-          <ProjectTabs
+          <div className="px-5"><ProjectTabs
             description={project.description}
             canManage={user.role === "ADMIN"}
             tasks={project.tasks.map((task) => ({
@@ -143,9 +117,8 @@ export default async function ProjectDetailsPage({
               ...item,
               createdAt: item.createdAt.toISOString(),
             }))}
-          />
-        </CardContent>
-      </Card>
+          /></div>
+      </section>
     </div>
   );
 }

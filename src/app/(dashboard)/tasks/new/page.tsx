@@ -1,5 +1,4 @@
 import { TaskForm } from "@/components/forms/resource-forms";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/db";
@@ -23,11 +22,7 @@ export default async function NewTaskPage() {
         title="Create task"
         description="Add work to a project and assign an owner."
       />
-      <Card>
-        <CardHeader>
-          <CardTitle>Task details</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className="rounded-lg border bg-card p-5 sm:p-6">
           <TaskForm
             projects={projects.map((project) => ({
               id: project.id,
@@ -35,8 +30,7 @@ export default async function NewTaskPage() {
               members: project.members.map((member) => member.user),
             }))}
           />
-        </CardContent>
-      </Card>
+      </section>
     </div>
   );
 }

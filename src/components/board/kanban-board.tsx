@@ -63,7 +63,7 @@ function TaskCardContent({
           type="button"
           {...dragHandle}
           aria-label={`Move ${task.title}`}
-          className="text-muted-foreground mt-0.5 cursor-grab active:cursor-grabbing"
+          className="text-muted-foreground hover:bg-muted -m-1.5 grid size-8 shrink-0 cursor-grab place-items-center rounded-md active:cursor-grabbing"
         >
           <GripVertical className="size-4" />
         </button>
@@ -74,7 +74,7 @@ function TaskCardContent({
           </p>
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-between gap-2">
+      <div className="mt-3 flex items-center justify-between gap-2 pl-7">
         <Badge value={task.priority} />
         {task.assignee ? (
           <Avatar name={task.assignee.name} size="sm" />
@@ -85,7 +85,7 @@ function TaskCardContent({
       {task.deadline ? (
         <p
           className={cn(
-            "text-muted-foreground mt-3 flex items-center gap-1.5 text-xs",
+            "text-muted-foreground mt-3 flex items-center gap-1.5 pl-7 text-[11px]",
             isOverdue(new Date(task.deadline), task.status) &&
               "text-danger font-medium",
           )}
@@ -109,8 +109,8 @@ function SortableTaskCard({ task }: { task: BoardTask }) {
       }}
       {...sortable.attributes}
       className={cn(
-        "bg-card rounded-xl border p-3 shadow-sm",
-        sortable.isDragging && "opacity-30",
+        "bg-card rounded-md border p-3 transition-[border-color,box-shadow,opacity] hover:border-border-strong",
+        sortable.isDragging && "opacity-25",
       )}
     >
       <TaskCardContent task={task} dragHandle={sortable.listeners} />
@@ -132,13 +132,13 @@ function Column({
     <section
       ref={setNodeRef}
       className={cn(
-        "bg-muted/65 w-[300px] shrink-0 rounded-xl p-3",
-        isOver && "ring-primary/50 ring-2",
+        "bg-muted/70 flex h-full w-[min(85vw,304px)] shrink-0 snap-start flex-col rounded-lg border p-2.5 sm:w-[288px] xl:flex-1",
+        isOver && "border-primary ring-primary/20 ring-2",
       )}
     >
-      <div className="mb-3 flex items-center justify-between px-1">
-        <h2 className="text-sm font-semibold">{label}</h2>
-        <span className="bg-card text-muted-foreground rounded-full px-2 py-0.5 text-xs">
+      <div className="mb-2 flex items-center justify-between px-1 py-1">
+        <h2 className="flex items-center gap-2 text-[13px] font-semibold"><span className="bg-muted-foreground/55 size-1.5 rounded-full" />{label}</h2>
+        <span className="bg-card text-muted-foreground rounded-full border px-2 py-0.5 text-[11px]">
           {tasks.length}
         </span>
       </div>
@@ -146,10 +146,11 @@ function Column({
         items={tasks.map((task) => task.id)}
         strategy={rectSortingStrategy}
       >
-        <div className="min-h-24 space-y-3">
+        <div className="min-h-24 flex-1 space-y-2.5 overflow-y-auto overscroll-contain pr-0.5">
           {tasks.map((task) => (
             <SortableTaskCard key={task.id} task={task} />
           ))}
+          {!tasks.length ? <div className="text-muted-foreground grid min-h-28 place-items-center rounded-md border border-dashed bg-card/30 px-4 text-center text-xs">Drop tasks here</div> : null}
         </div>
       </SortableContext>
     </section>
@@ -159,7 +160,7 @@ function Column({
 export function KanbanBoard({ initialTasks }: { initialTasks: BoardTask[] }) {
   const [tasks, setTasks] = useState(initialTasks);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
+  const [pending, startTransition] = useTransition();
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, {
@@ -271,14 +272,15 @@ export function KanbanBoard({ initialTasks }: { initialTasks: BoardTask[] }) {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="mb-2 flex h-5 justify-end" aria-live="polite">{pending ? <span className="text-muted-foreground text-[11px]">Saving board…</span> : null}</div>
+      <div className="flex h-[calc(100dvh-250px)] min-h-[520px] snap-x snap-mandatory gap-3 overflow-x-auto pb-2 xl:overflow-x-visible">
         {columns.map((column) => (
           <Column key={column.id} {...column} tasks={grouped[column.id]} />
         ))}
       </div>
       <DragOverlay>
         {activeTask ? (
-          <div className="bg-card w-[276px] rotate-2 rounded-xl border p-3 shadow-xl">
+          <div className="bg-surface-elevated w-[276px] rotate-1 rounded-lg border border-primary/30 p-3 shadow-[0_18px_50px_rgba(0,0,0,.22)]">
             <TaskCardContent task={activeTask} />
           </div>
         ) : null}

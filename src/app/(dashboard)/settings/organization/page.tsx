@@ -1,12 +1,5 @@
 import { OrganizationForm } from "@/components/forms/resource-forms";
 import { SettingsNav } from "@/components/settings/settings-nav";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/db";
@@ -17,27 +10,19 @@ export default async function OrganizationSettingsPage() {
     where: { id: user.organizationId },
   });
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="space-y-6">
       <PageHeader
         title="Organization settings"
         description="Manage your BusinessFlow workspace."
-        action={<SettingsNav admin />}
       />
-      <Card>
-        <CardHeader>
-          <CardTitle>Organization</CardTitle>
-          <CardDescription>
-            The workspace slug is read-only in this MVP.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <OrganizationForm initial={{ name: organization.name }} />
-          <div className="bg-muted rounded-lg p-3 text-sm">
-            <span className="text-muted-foreground">Slug</span>
-            <p className="mt-1 font-mono text-xs">{organization.slug}</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 md:grid-cols-[180px_minmax(0,720px)]">
+        <SettingsNav admin />
+        <section className="rounded-lg border bg-card p-5 sm:p-6">
+          <div className="border-b pb-5"><h2 className="text-base font-semibold">Organization</h2><p className="text-muted-foreground mt-1 text-xs">Manage the identity of this workspace.</p></div>
+          <div className="py-5"><OrganizationForm initial={{ name: organization.name }} /></div>
+          <dl className="border-t pt-5"><dt className="text-muted-foreground text-xs">Workspace slug · read only</dt><dd className="mt-1 font-mono text-xs">{organization.slug}</dd></dl>
+        </section>
+      </div>
     </div>
   );
 }

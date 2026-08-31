@@ -48,7 +48,7 @@ These credentials are intentionally local demo data. Do not reuse the password i
 Prerequisites: Node.js 24 LTS, pnpm 12, Git, and Docker Desktop with WSL2/hardware virtualization enabled.
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/K-Kabak/businessflow.git
 cd businessflow
 pnpm install
 docker compose up -d

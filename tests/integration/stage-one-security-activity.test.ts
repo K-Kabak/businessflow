@@ -17,21 +17,14 @@ const authState = vi.hoisted(() => ({
 }));
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-vi.mock("@/lib/auth-helpers", () => ({
-  requireAdmin: vi.fn(async () => authState.user!),
-  requireUser: vi.fn(async () => authState.user!),
-  clientScope: (user: NonNullable<typeof authState.user>) => ({
-    organizationId: user.organizationId,
-    ...(user.role === "EMPLOYEE"
-      ? { projects: { some: { members: { some: { userId: user.id } } } } }
-      : {}),
-  }),
-  taskScope: (user: NonNullable<typeof authState.user>) => ({
-    organizationId: user.organizationId,
-    ...(user.role === "EMPLOYEE"
-      ? { project: { members: { some: { userId: user.id } } } }
-      : {}),
-  }),
+vi.mock("@/auth", () => ({ auth: async () => ({ user: authState.user }) }));
+vi.mock("next/navigation", () => ({
+  notFound: () => {
+    throw new Error("NEXT_NOT_FOUND");
+  },
+  redirect: () => {
+    throw new Error("NEXT_REDIRECT");
+  },
 }));
 
 const databaseUrl = process.env.TEST_DATABASE_URL;

@@ -6,12 +6,18 @@ export class BoardOrderError extends Error {}
 
 export async function serializable<T>(
   work: (tx: Prisma.TransactionClient) => Promise<T>,
+  lockKey?: string,
 ): Promise<T> {
   for (let retry = 0; ; retry++) {
     try {
-      return await prisma.$transaction(work, {
-        isolationLevel: "Serializable",
-      });
+      return await prisma.$transaction(
+        async (tx) => {
+          if (lockKey)
+            await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
+          return work(tx);
+        },
+        { isolationLevel: "Serializable" },
+      );
     } catch (error) {
       if (
         !(error instanceof Prisma.PrismaClientKnownRequestError) ||

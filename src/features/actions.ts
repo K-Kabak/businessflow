@@ -498,7 +498,7 @@ export async function saveTaskAction(
           message: "Task created.",
         };
       }
-    });
+    }, user.organizationId);
     if (result.success) {
       revalidatePath("/tasks");
       revalidatePath("/board");
@@ -582,7 +582,7 @@ export async function moveTaskAction(input: unknown): Promise<ActionResult> {
         });
       }
       return task.projectId;
-    });
+    }, user.organizationId);
     revalidatePath("/board");
     revalidatePath("/tasks");
     revalidatePath(`/projects/${projectId}`);

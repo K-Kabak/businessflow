@@ -178,6 +178,7 @@ model Task {
   @@index([projectId])
   @@index([assigneeId])
   @@index([organizationId, status, position])
+  @@index([organizationId, projectId, status, position])
   @@index([deadline])
 }
 

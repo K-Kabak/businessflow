@@ -7,7 +7,7 @@ import { requireAdmin, requireUser, taskScope } from "@/lib/auth-helpers";
 import { logActivity } from "@/lib/activity";
 import { prisma } from "@/lib/db";
 import { parseDateInput } from "@/lib/utils";
-import { calculateBoardPosition } from "@/lib/board";
+import { BoardOrderError, placeTask, serializable } from "@/lib/board-order";
 import {
   clientSchema,
   moveTaskSchema,
@@ -346,150 +346,168 @@ export async function saveTaskAction(
   const parsed = taskSchema.safeParse(input);
   if (!parsed.success) return validationError(parsed.error);
   const { id, assigneeId, deadline, ...value } = parsed.data;
-  const project = await prisma.project.findFirst({
-    where: { id: value.projectId, organizationId: user.organizationId },
-    select: { id: true },
-  });
-  if (!project)
-    return {
-      success: false,
-      code: "VALIDATION",
-      message: "Select a project in your organization.",
-    };
-  let assigneeName: string | null = null;
-  if (assigneeId) {
-    const member = await prisma.projectMember.findFirst({
-      where: {
-        projectId: value.projectId,
-        userId: assigneeId,
-        organizationId: user.organizationId,
-      },
-      select: { user: { select: { name: true } } },
-    });
-    if (!member)
-      return {
-        success: false,
-        code: "VALIDATION",
-        message: "Assignee must be a project member.",
-        fieldErrors: { assigneeId: ["Assignee must be a project member."] },
-      };
-    assigneeName = member.user.name;
-  }
   try {
-    if (id) {
-      const existing = await prisma.task.findFirst({
-        where: { id, organizationId: user.organizationId },
-        include: { assignee: { select: { name: true } } },
+    const result = await serializable<
+      ActionResult<{ id: string; previousProjectId?: string }>
+    >(async (tx) => {
+      const project = await tx.project.findFirst({
+        where: { id: value.projectId, organizationId: user.organizationId },
+        select: { id: true },
       });
-      if (!existing)
+      if (!project)
         return {
           success: false,
-          code: "NOT_FOUND",
-          message: "Task not found.",
+          code: "VALIDATION",
+          message: "Select a project in your organization.",
         };
-      const nextAssigneeId = assigneeId || null;
-      const assigneeChanged = existing.assigneeId !== nextAssigneeId;
-      await prisma.$transaction(async (tx) => {
-        await tx.task.update({
-          where: { id },
-          data: {
-            ...value,
-            assigneeId: nextAssigneeId,
-            deadline: parseDateInput(deadline),
+      let assigneeName: string | null = null;
+      if (assigneeId) {
+        const member = await tx.projectMember.findFirst({
+          where: {
+            projectId: value.projectId,
+            userId: assigneeId,
+            organizationId: user.organizationId,
           },
+          select: { user: { select: { name: true } } },
         });
-        const statusChanged = existing.status !== value.status;
-        await logActivity(tx, {
-          organizationId: user.organizationId,
-          userId: user.id,
-          entityType: "TASK",
-          entityId: id,
-          action: statusChanged ? "STATUS_CHANGED" : "UPDATED",
-          description: statusChanged
-            ? `${user.name} changed task “${value.title}” from ${existing.status} to ${value.status}.`
-            : `${user.name} updated task “${value.title}”.`,
-          metadata: statusChanged
-            ? {
-                previous: existing.status,
-                next: value.status,
-                projectId: value.projectId,
-              }
-            : { projectId: value.projectId },
+        if (!member)
+          return {
+            success: false,
+            code: "VALIDATION",
+            message: "Assignee must be a project member.",
+            fieldErrors: { assigneeId: ["Assignee must be a project member."] },
+          };
+        assigneeName = member.user.name;
+      }
+      if (id) {
+        const existing = await tx.task.findFirst({
+          where: { id, organizationId: user.organizationId },
+          include: { assignee: { select: { name: true } } },
         });
-        if (assigneeChanged) {
-          const description = existing.assignee
-            ? assigneeName
-              ? `${user.name} reassigned task “${value.title}” from ${existing.assignee.name} to ${assigneeName}.`
-              : `${user.name} unassigned ${existing.assignee.name} from task “${value.title}”.`
-            : `${user.name} assigned task “${value.title}” to ${assigneeName}.`;
+        if (!existing)
+          return {
+            success: false,
+            code: "NOT_FOUND",
+            message: "Task not found.",
+          };
+        const nextAssigneeId = assigneeId || null;
+        const assigneeChanged = existing.assigneeId !== nextAssigneeId;
+        {
+          await tx.task.update({
+            where: { id },
+            data: {
+              ...value,
+              assigneeId: nextAssigneeId,
+              deadline: parseDateInput(deadline),
+            },
+          });
+          const statusChanged = existing.status !== value.status;
           await logActivity(tx, {
             organizationId: user.organizationId,
             userId: user.id,
             entityType: "TASK",
             entityId: id,
-            action: "ASSIGNED",
-            description,
-            metadata: {
-              previousAssigneeId: existing.assigneeId,
-              nextAssigneeId,
-              projectId: value.projectId,
-            },
+            action: statusChanged ? "STATUS_CHANGED" : "UPDATED",
+            description: statusChanged
+              ? `${user.name} changed task “${value.title}” from ${existing.status} to ${value.status}.`
+              : `${user.name} updated task “${value.title}”.`,
+            metadata: statusChanged
+              ? {
+                  previous: existing.status,
+                  next: value.status,
+                  projectId: value.projectId,
+                }
+              : { projectId: value.projectId },
           });
+          if (assigneeChanged) {
+            const description = existing.assignee
+              ? assigneeName
+                ? `${user.name} reassigned task “${value.title}” from ${existing.assignee.name} to ${assigneeName}.`
+                : `${user.name} unassigned ${existing.assignee.name} from task “${value.title}”.`
+              : `${user.name} assigned task “${value.title}” to ${assigneeName}.`;
+            await logActivity(tx, {
+              organizationId: user.organizationId,
+              userId: user.id,
+              entityType: "TASK",
+              entityId: id,
+              action: "ASSIGNED",
+              description,
+              metadata: {
+                previousAssigneeId: existing.assigneeId,
+                nextAssigneeId,
+                projectId: value.projectId,
+              },
+            });
+          }
         }
-      });
-      revalidatePath("/tasks");
-      revalidatePath("/board");
-      revalidatePath(`/projects/${value.projectId}`);
-      return { success: true, data: { id }, message: "Task updated." };
-    }
-    const max = await prisma.task.aggregate({
-      where: { organizationId: user.organizationId, status: value.status },
-      _max: { position: true },
-    });
-    const created = await prisma.$transaction(async (tx) => {
-      const task = await tx.task.create({
-        data: {
-          ...value,
-          organizationId: user.organizationId,
-          assigneeId: assigneeId || null,
-          deadline: parseDateInput(deadline),
-          position: (max._max.position ?? 0) + 1000,
-        },
-      });
-      await logActivity(tx, {
-        organizationId: user.organizationId,
-        userId: user.id,
-        entityType: "TASK",
-        entityId: task.id,
-        action: "CREATED",
-        description: `${user.name} created task “${task.title}”.`,
-        metadata: { projectId: task.projectId },
-      });
-      if (assigneeId) {
+        if (
+          existing.projectId !== value.projectId ||
+          existing.status !== value.status
+        ) {
+          await placeTask(
+            tx,
+            user,
+            { id, projectId: value.projectId },
+            value.status,
+          );
+        }
+        return {
+          success: true,
+          data: { id, previousProjectId: existing.projectId },
+          message: "Task updated.",
+        };
+      }
+      {
+        const task = await tx.task.create({
+          data: {
+            ...value,
+            organizationId: user.organizationId,
+            assigneeId: assigneeId || null,
+            deadline: parseDateInput(deadline),
+            position: 1000,
+          },
+        });
         await logActivity(tx, {
           organizationId: user.organizationId,
           userId: user.id,
           entityType: "TASK",
           entityId: task.id,
-          action: "ASSIGNED",
-          description: `${user.name} assigned task “${task.title}” to ${assigneeName}.`,
-          metadata: {
-            previousAssigneeId: null,
-            nextAssigneeId: assigneeId,
-            projectId: task.projectId,
-          },
+          action: "CREATED",
+          description: `${user.name} created task “${task.title}”.`,
+          metadata: { projectId: task.projectId },
         });
+        if (assigneeId) {
+          await logActivity(tx, {
+            organizationId: user.organizationId,
+            userId: user.id,
+            entityType: "TASK",
+            entityId: task.id,
+            action: "ASSIGNED",
+            description: `${user.name} assigned task “${task.title}” to ${assigneeName}.`,
+            metadata: {
+              previousAssigneeId: null,
+              nextAssigneeId: assigneeId,
+              projectId: task.projectId,
+            },
+          });
+        }
+        await placeTask(tx, user, task, task.status);
+        return {
+          success: true,
+          data: { id: task.id },
+          message: "Task created.",
+        };
       }
-      return task;
     });
-    revalidatePath("/tasks");
-    revalidatePath("/board");
-    revalidatePath(`/projects/${value.projectId}`);
-    return {
-      success: true,
-      data: { id: created.id },
-      message: "Task created.",
-    };
+    if (result.success) {
+      revalidatePath("/tasks");
+      revalidatePath("/board");
+      revalidatePath("/dashboard");
+      revalidatePath(`/projects/${value.projectId}`);
+      if (result.data?.previousProjectId)
+        revalidatePath(`/projects/${result.data.previousProjectId}`);
+    }
+    return result;
   } catch {
     return unknownError("Something went wrong while saving the task.");
   }
@@ -532,74 +550,53 @@ export async function moveTaskAction(input: unknown): Promise<ActionResult> {
   const parsed = moveTaskSchema.safeParse(input);
   if (!parsed.success) return validationError(parsed.error);
   const { taskId, destinationStatus, beforeTaskId, afterTaskId } = parsed.data;
-  const scope = taskScope(user);
-  const task = await prisma.task.findFirst({ where: { id: taskId, ...scope } });
-  if (!task)
-    return { success: false, code: "NOT_FOUND", message: "Task not found." };
-  const neighbors = await prisma.task.findMany({
-    where: {
-      id: { in: [beforeTaskId, afterTaskId].filter(Boolean) as string[] },
-      status: destinationStatus,
-      ...scope,
-    },
-    select: { id: true, position: true },
-  });
-  if (
-    (beforeTaskId && !neighbors.some((item) => item.id === beforeTaskId)) ||
-    (afterTaskId && !neighbors.some((item) => item.id === afterTaskId))
-  )
+  try {
+    const projectId = await serializable(async (tx) => {
+      const task = await tx.task.findFirst({
+        where: { id: taskId, ...taskScope(user) },
+      });
+      if (!task) throw new BoardOrderError("Task not found.");
+      if (task.status === destinationStatus && !beforeTaskId && !afterTaskId)
+        return task.projectId;
+      await placeTask(
+        tx,
+        user,
+        task,
+        destinationStatus,
+        beforeTaskId,
+        afterTaskId,
+      );
+      if (task.status !== destinationStatus) {
+        await logActivity(tx, {
+          organizationId: user.organizationId,
+          userId: user.id,
+          entityType: "TASK",
+          entityId: task.id,
+          action: "STATUS_CHANGED",
+          description: `${user.name} changed task “${task.title}” from ${task.status} to ${destinationStatus}.`,
+          metadata: {
+            previous: task.status,
+            next: destinationStatus,
+            projectId: task.projectId,
+          },
+        });
+      }
+      return task.projectId;
+    });
+    revalidatePath("/board");
+    revalidatePath("/tasks");
+    revalidatePath(`/projects/${projectId}`);
+    revalidatePath("/dashboard");
+    return { success: true, message: "Board updated." };
+  } catch (error) {
+    if (error instanceof BoardOrderError)
+      return { success: false, code: "NOT_FOUND", message: error.message };
     return {
       success: false,
-      code: "NOT_FOUND",
-      message: "Board position is no longer available. Refresh and try again.",
+      code: "CONFLICT",
+      message: "Unable to save the board. Refresh and try again.",
     };
-  const before = neighbors.find((item) => item.id === beforeTaskId)?.position;
-  const after = neighbors.find((item) => item.id === afterTaskId)?.position;
-  let position = calculateBoardPosition(before, after);
-  if (position === null) {
-    const ordered = await prisma.task.findMany({
-      where: { status: destinationStatus, ...scope, id: { not: taskId } },
-      orderBy: [{ position: "asc" }, { createdAt: "asc" }],
-      select: { id: true },
-    });
-    await prisma.$transaction(
-      ordered.map((item, index) =>
-        prisma.task.update({
-          where: { id: item.id },
-          data: { position: (index + 1) * 1000 },
-        }),
-      ),
-    );
-    const beforeIndex = beforeTaskId
-      ? ordered.findIndex((item) => item.id === beforeTaskId)
-      : -1;
-    position = beforeIndex >= 0 ? (beforeIndex + 1) * 1000 + 500 : 500;
   }
-  await prisma.$transaction(async (tx) => {
-    await tx.task.update({
-      where: { id: task.id },
-      data: { status: destinationStatus, position: position ?? 1000 },
-    });
-    if (task.status !== destinationStatus)
-      await logActivity(tx, {
-        organizationId: user.organizationId,
-        userId: user.id,
-        entityType: "TASK",
-        entityId: task.id,
-        action: "STATUS_CHANGED",
-        description: `${user.name} changed task “${task.title}” from ${task.status} to ${destinationStatus}.`,
-        metadata: {
-          previous: task.status,
-          next: destinationStatus,
-          projectId: task.projectId,
-        },
-      });
-  });
-  revalidatePath("/board");
-  revalidatePath("/tasks");
-  revalidatePath(`/projects/${task.projectId}`);
-  revalidatePath("/dashboard");
-  return { success: true, message: `Task moved to ${destinationStatus}.` };
 }
 
 export async function updateProfileAction(

@@ -28,7 +28,13 @@ export default async function BoardPage({
   const [tasks, projects, assignees] = await Promise.all([
     prisma.task.findMany({
       where,
-      orderBy: [{ status: "asc" }, { position: "asc" }],
+      orderBy: [
+        { status: "asc" },
+        { projectId: "asc" },
+        { position: "asc" },
+        { createdAt: "asc" },
+        { id: "asc" },
+      ],
       include: {
         project: { select: { name: true } },
         assignee: { select: { name: true } },
@@ -50,7 +56,9 @@ export default async function BoardPage({
     deadline: task.deadline?.toISOString() ?? null,
   }));
   const boardKey = boardTasks
-    .map((task) => `${task.id}:${task.status}:${task.position}`)
+    .map(
+      (task) => `${task.id}:${task.projectId}:${task.status}:${task.position}`,
+    )
     .join("|");
   return (
     <div className="space-y-6">
@@ -99,7 +107,11 @@ export default async function BoardPage({
         </form>
       </FilterBar>
       {tasks.length ? (
-        <KanbanBoard key={boardKey} initialTasks={boardTasks} />
+        <KanbanBoard
+          key={`${projectId}:${boardKey}`}
+          initialTasks={boardTasks}
+          canDrag={projects.some((project) => project.id === projectId)}
+        />
       ) : (
         <EmptyState
           title="No tasks on this board"

@@ -54,6 +54,10 @@ test("admin can create a project and task", async ({ page }) => {
 test("Kanban move persists after refresh", async ({ page }) => {
   await signIn(page);
   await page.goto("/board");
+  await page
+    .getByLabel("Filter project")
+    .selectOption({ label: "Website Redesign" });
+  await page.getByRole("button", { name: "Apply filters" }).click();
   const taskHandle = page.getByRole("button", {
     name: "Move Create landing page",
     exact: true,
@@ -84,7 +88,7 @@ test("Kanban move persists after refresh", async ({ page }) => {
   );
   await page.mouse.up();
   await expect(doneColumn.getByText("Create landing page")).toBeVisible();
-  await expect(page.getByText("Task moved to DONE.")).toBeVisible();
+  await expect(page.getByText("Board updated.")).toBeVisible();
   await page.reload();
   await expect(doneColumn.getByText("Create landing page")).toBeVisible();
 });

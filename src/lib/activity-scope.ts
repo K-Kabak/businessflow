@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/db";
 import type { requireUser } from "@/lib/auth-helpers";

@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  globalSetup: "./tests/e2e/global-setup.ts",
   fullyParallel: false,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
@@ -14,7 +15,7 @@ export default defineConfig({
   webServer: {
     command: process.env.PLAYWRIGHT_PRODUCTION ? "pnpm start" : "pnpm dev",
     url: "http://127.0.0.1:3000/login",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env.CI && !process.env.E2E_DATABASE_URL,
     env: {
       DATABASE_URL:
         process.env.E2E_DATABASE_URL ?? process.env.DATABASE_URL ?? "",

@@ -2043,254 +2043,255 @@ Projekt jest ukończony, gdy:
 
 ## Etap 1 — inicjalizacja
 
-- [ ] Utwórz Next.js App Router + TypeScript.
-- [ ] Skonfiguruj `pnpm`.
-- [ ] Włącz strict TypeScript.
-- [ ] Skonfiguruj ESLint i formatowanie.
-- [ ] Skonfiguruj Tailwind CSS.
-- [ ] Dodaj shadcn/ui, Lucide, Sonner, next-themes.
-- [ ] Utwórz podstawową strukturę katalogów.
-- [ ] Utwórz `.env.example`.
-- [ ] Zweryfikuj `.gitignore`.
-- [ ] Zainicjalizuj lub zweryfikuj repo Git.
-- [ ] Wykonaj pierwszy logiczny commit.
-- [ ] Skonfiguruj GitHub remote, jeśli dostępny.
-- [ ] Wykonaj pierwszy push, jeśli możliwy.
+- [x] Utwórz Next.js App Router + TypeScript.
+- [x] Skonfiguruj `pnpm`.
+- [x] Włącz strict TypeScript.
+- [x] Skonfiguruj ESLint i formatowanie.
+- [x] Skonfiguruj Tailwind CSS.
+- [x] Dodaj shadcn/ui, Lucide, Sonner, next-themes.
+- [x] Utwórz podstawową strukturę katalogów.
+- [x] Utwórz `.env.example`.
+- [x] Zweryfikuj `.gitignore`.
+- [x] Zainicjalizuj lub zweryfikuj repo Git.
+- [x] Wykonaj pierwszy logiczny commit.
+- [x] Skonfiguruj GitHub remote, jeśli dostępny.
+- [x] Wykonaj pierwszy push, jeśli możliwy.
 
 ## Etap 2 — PostgreSQL i Prisma
 
-- [ ] Dodaj `docker-compose.yml` z PostgreSQL.
-- [ ] Dodaj persistent volume.
-- [ ] Zainstaluj Prisma.
-- [ ] Skonfiguruj `DATABASE_URL`.
-- [ ] Utwórz wszystkie modele i enumy.
-- [ ] Dodaj relacje i `onDelete`.
-- [ ] Dodaj potrzebne indeksy.
-- [ ] Utwórz pierwszą migrację.
-- [ ] Zweryfikuj migrację na czystej bazie.
-- [ ] Commit i push etapu.
+- [x] Dodaj `docker-compose.yml` z PostgreSQL.
+- [x] Dodaj persistent volume.
+- [x] Zainstaluj Prisma.
+- [x] Skonfiguruj `DATABASE_URL`.
+- [x] Utwórz wszystkie modele i enumy.
+- [x] Dodaj relacje i `onDelete`.
+- [x] Dodaj potrzebne indeksy.
+- [x] Utwórz pierwszą migrację.
+- [x] Zweryfikuj migrację na czystej bazie.
+- [x] Commit i push etapu.
 
 ## Etap 3 — seed
 
-- [ ] Utwórz `prisma/seed.ts`.
-- [ ] Dodaj organizację demo.
-- [ ] Dodaj admina i employee.
-- [ ] Hashuj demo passwords.
-- [ ] Dodaj klientów.
-- [ ] Dodaj projekty.
-- [ ] Dodaj ProjectMembers.
-- [ ] Dodaj 20–30 zadań.
-- [ ] Dodaj overdue/completed data.
-- [ ] Dodaj Activity Logs.
-- [ ] Zweryfikuj reset + seed.
-- [ ] Commit i push.
+- [x] Utwórz `prisma/seed.ts`.
+- [x] Dodaj organizację demo.
+- [x] Dodaj admina i employee.
+- [x] Hashuj demo passwords.
+- [x] Dodaj klientów.
+- [x] Dodaj projekty.
+- [x] Dodaj ProjectMembers.
+- [x] Dodaj 20–30 zadań.
+- [x] Dodaj overdue/completed data.
+- [x] Dodaj Activity Logs.
+- [x] Zweryfikuj reset + seed.
+- [x] Commit i push.
 
 ## Etap 4 — Authentication
 
-- [ ] Skonfiguruj Auth.js.
-- [ ] Dodaj Credentials Provider.
-- [ ] Dodaj bezpieczne porównanie haseł.
-- [ ] Rozszerz session o `userId`, `organizationId`, `role`.
-- [ ] Utwórz `requireUser`.
-- [ ] Utwórz `requireAdmin`.
-- [ ] Zabezpiecz dashboard routes.
-- [ ] Zaimplementuj `/login`.
-- [ ] Dodaj logout.
-- [ ] Zweryfikuj konta demo.
-- [ ] Commit i push.
+- [x] Skonfiguruj Auth.js.
+- [x] Dodaj Credentials Provider.
+- [x] Dodaj bezpieczne porównanie haseł.
+- [x] Rozszerz session o `userId`, `organizationId`, `role`.
+- [x] Utwórz `requireUser`.
+- [x] Utwórz `requireAdmin`.
+- [x] Zabezpiecz dashboard routes.
+- [x] Zaimplementuj `/login`.
+- [x] Dodaj logout.
+- [x] Zweryfikuj konta demo.
+- [x] Commit i push.
 
 ## Etap 5 — permissions i tenant isolation
 
-- [ ] Utwórz centralny permission layer.
-- [ ] Dodaj ownership helpers.
-- [ ] Dodaj `canAccessProject`.
-- [ ] Zaimplementuj ADMIN/EMPLOYEE rules.
-- [ ] Zaimplementuj bezpieczne zachowanie dla foreign tenant resources.
-- [ ] Dodaj testy permission helpers.
-- [ ] Dodaj test izolacji dwóch organizacji.
-- [ ] Commit i push.
+- [x] Utwórz centralny permission layer.
+- [x] Dodaj ownership helpers.
+- [x] Dodaj `canAccessProject`.
+- [x] Zaimplementuj ADMIN/EMPLOYEE rules.
+- [x] Zaimplementuj bezpieczne zachowanie dla foreign tenant resources.
+- [x] Dodaj testy permission helpers.
+- [x] Dodaj test izolacji dwóch organizacji.
+- [x] Commit i push.
 
 ## Etap 6 — layout i design foundation
 
-- [ ] Utwórz dashboard layout.
-- [ ] Utwórz Sidebar.
-- [ ] Utwórz Header.
-- [ ] Dodaj user menu.
-- [ ] Dodaj mobile navigation.
-- [ ] Dodaj theme switcher.
-- [ ] Dodaj shared PageHeader, badges, EmptyState, Skeleton.
-- [ ] Zweryfikuj desktop/tablet/mobile.
-- [ ] Commit i push.
+- [x] Utwórz dashboard layout.
+- [x] Utwórz Sidebar.
+- [x] Utwórz Header.
+- [x] Dodaj user menu.
+- [x] Dodaj mobile navigation.
+- [x] Dodaj theme switcher.
+- [x] Dodaj shared PageHeader, badges i EmptyState.
+- [ ] Dodaj shared Skeleton.
+- [x] Zweryfikuj desktop/tablet/mobile.
+- [x] Commit i push.
 
 ## Etap 7 — Activity Log infrastructure
 
-- [ ] Utwórz helper logowania aktywności.
-- [ ] Dodaj wspólny model actions/entity types.
-- [ ] Dodaj transaction patterns.
-- [ ] Przetestuj log creation.
-- [ ] Commit i push.
+- [x] Utwórz helper logowania aktywności.
+- [x] Dodaj wspólny model actions/entity types.
+- [x] Dodaj transaction patterns.
+- [x] Przetestuj log creation.
+- [x] Commit i push.
 
 ## Etap 8 — Clients
 
-- [ ] Utwórz `/clients`.
-- [ ] Dodaj query scoped do organization.
-- [ ] Dodaj search/filter/pagination.
+- [x] Utwórz `/clients`.
+- [x] Dodaj query scoped do organization.
+- [x] Dodaj search/filter/pagination.
 - [ ] Dodaj TanStack Table.
-- [ ] Utwórz `/clients/new`.
-- [ ] Utwórz Zod schema.
-- [ ] Dodaj create action + Activity Log.
-- [ ] Utwórz `/clients/[clientId]`.
-- [ ] Dodaj edit.
-- [ ] Dodaj delete z blokadą, gdy istnieją projekty.
-- [ ] Dodaj loading/error/empty states.
-- [ ] Dodaj testy.
-- [ ] Commit i push.
+- [x] Utwórz `/clients/new`.
+- [x] Utwórz Zod schema.
+- [x] Dodaj create action + Activity Log.
+- [x] Utwórz `/clients/[clientId]`.
+- [x] Dodaj edit.
+- [x] Dodaj delete z blokadą, gdy istnieją projekty.
+- [x] Dodaj loading/error/empty states.
+- [x] Dodaj testy.
+- [x] Commit i push.
 
 ## Etap 9 — Projects
 
-- [ ] Utwórz `/projects`.
-- [ ] Dodaj search i filters.
-- [ ] Dodaj pagination i sorting.
-- [ ] Dodaj EMPLOYEE scoping.
-- [ ] Utwórz `/projects/new`.
-- [ ] Dodaj schema i create action.
-- [ ] Dodaj ProjectMembers.
-- [ ] Utwórz `/projects/[projectId]`.
-- [ ] Dodaj Overview/Tasks/Activity tabs.
-- [ ] Dodaj progress calculation.
-- [ ] Dodaj edit project.
-- [ ] Dodaj member management.
-- [ ] Dodaj project delete confirmation.
-- [ ] Zweryfikuj permissions.
-- [ ] Commit i push.
+- [x] Utwórz `/projects`.
+- [x] Dodaj search i filters.
+- [x] Dodaj pagination i sorting.
+- [x] Dodaj EMPLOYEE scoping.
+- [x] Utwórz `/projects/new`.
+- [x] Dodaj schema i create action.
+- [x] Dodaj ProjectMembers.
+- [x] Utwórz `/projects/[projectId]`.
+- [x] Dodaj Overview/Tasks/Activity tabs.
+- [x] Dodaj progress calculation.
+- [x] Dodaj edit project.
+- [x] Dodaj member management.
+- [x] Dodaj project delete confirmation.
+- [x] Zweryfikuj permissions.
+- [x] Commit i push.
 
 ## Etap 10 — Tasks
 
-- [ ] Utwórz task Zod schema.
-- [ ] Dodaj create task.
-- [ ] Zweryfikuj organization i project ownership.
-- [ ] Zweryfikuj assignee project membership.
-- [ ] Dodaj edit task.
-- [ ] Dodaj EMPLOYEE status-only restriction.
-- [ ] Dodaj delete task.
-- [ ] Dodaj Activity Logs.
-- [ ] Utwórz `/tasks`.
-- [ ] Dodaj search/filter/pagination.
-- [ ] Dodaj overdue indicator.
-- [ ] Dodaj empty states.
-- [ ] Commit i push.
+- [x] Utwórz task Zod schema.
+- [x] Dodaj create task.
+- [x] Zweryfikuj organization i project ownership.
+- [x] Zweryfikuj assignee project membership.
+- [x] Dodaj edit task.
+- [x] Dodaj EMPLOYEE status-only restriction.
+- [x] Dodaj delete task.
+- [x] Dodaj Activity Logs.
+- [x] Utwórz `/tasks`.
+- [x] Dodaj search/filter/pagination.
+- [x] Dodaj overdue indicator.
+- [x] Dodaj empty states.
+- [x] Commit i push.
 
 ## Etap 11 — Kanban
 
-- [ ] Utwórz `/board`.
-- [ ] Dodaj 4 kolumny.
-- [ ] Utwórz TaskCard.
-- [ ] Skonfiguruj dnd-kit.
-- [ ] Dodaj zmianę kolumny.
-- [ ] Dodaj reorder w kolumnie.
-- [ ] Persistuj status.
-- [ ] Persistuj position.
-- [ ] Dodaj Activity Log dla status changes.
-- [ ] Dodaj filtry project/assignee.
-- [ ] Dodaj `My tasks`, jeśli proste.
-- [ ] Zweryfikuj persistence po refresh.
-- [ ] Zweryfikuj mobile UX.
-- [ ] Zweryfikuj employee permissions.
-- [ ] Commit i push.
+- [x] Utwórz `/board`.
+- [x] Dodaj 4 kolumny.
+- [x] Utwórz TaskCard.
+- [x] Skonfiguruj dnd-kit.
+- [x] Dodaj zmianę kolumny.
+- [x] Dodaj reorder w kolumnie.
+- [x] Persistuj status.
+- [x] Persistuj position.
+- [x] Dodaj Activity Log dla status changes.
+- [x] Dodaj filtry project/assignee.
+- [x] Dodaj `My tasks`, jeśli proste.
+- [x] Zweryfikuj persistence po refresh.
+- [x] Zweryfikuj mobile UX.
+- [x] Zweryfikuj employee permissions.
+- [x] Commit i push.
 
 ## Etap 12 — Dashboard
 
-- [ ] Dodaj KPI queries.
-- [ ] Dodaj Active Projects.
-- [ ] Dodaj Open Tasks.
-- [ ] Dodaj Overdue Tasks.
-- [ ] Dodaj Active Clients.
-- [ ] Dodaj project status chart.
-- [ ] Dodaj Upcoming Deadlines.
-- [ ] Dodaj Recent Activity.
-- [ ] Dodaj EMPLOYEE scoping.
-- [ ] Dodaj skeletons.
-- [ ] Zweryfikuj z seed data.
-- [ ] Commit i push.
+- [x] Dodaj KPI queries.
+- [x] Dodaj Active Projects.
+- [x] Dodaj Open Tasks.
+- [x] Dodaj Overdue Tasks.
+- [x] Dodaj Active Clients.
+- [x] Dodaj project status chart.
+- [x] Dodaj Upcoming Deadlines.
+- [x] Dodaj Recent Activity.
+- [x] Dodaj EMPLOYEE scoping.
+- [x] Dodaj skeletons.
+- [x] Zweryfikuj z seed data.
+- [x] Commit i push.
 
 ## Etap 13 — Team
 
-- [ ] Utwórz `/team`.
-- [ ] Wyświetl users organizacji.
-- [ ] Dodaj role/job title.
-- [ ] Dodaj active projects count.
-- [ ] Dodaj open tasks count.
-- [ ] Dodaj read-only EMPLOYEE behavior.
-- [ ] Commit i push.
+- [x] Utwórz `/team`.
+- [x] Wyświetl users organizacji.
+- [x] Dodaj role/job title.
+- [x] Dodaj active projects count.
+- [x] Dodaj open tasks count.
+- [x] Dodaj read-only EMPLOYEE behavior.
+- [x] Commit i push.
 
 ## Etap 14 — Activity page
 
-- [ ] Utwórz `/activity`.
-- [ ] Pobieraj tylko logi organizacji.
-- [ ] Sortuj newest first.
-- [ ] Dodaj pagination.
-- [ ] Dodaj entity type filter.
-- [ ] Dodaj user filter.
-- [ ] Dodaj empty state.
-- [ ] Commit i push.
+- [x] Utwórz `/activity`.
+- [x] Pobieraj tylko logi organizacji.
+- [x] Sortuj newest first.
+- [x] Dodaj pagination.
+- [x] Dodaj entity type filter.
+- [x] Dodaj user filter.
+- [x] Dodaj empty state.
+- [x] Commit i push.
 
 ## Etap 15 — Settings
 
-- [ ] Utwórz `/settings/profile`.
-- [ ] Dodaj name/jobTitle update.
-- [ ] Utwórz `/settings/organization`.
-- [ ] Ogranicz do ADMIN.
-- [ ] Dodaj organization name update.
-- [ ] Dodaj Activity Log.
-- [ ] Commit i push.
+- [x] Utwórz `/settings/profile`.
+- [x] Dodaj name/jobTitle update.
+- [x] Utwórz `/settings/organization`.
+- [x] Ogranicz do ADMIN.
+- [x] Dodaj organization name update.
+- [x] Dodaj Activity Log.
+- [x] Commit i push.
 
 ## Etap 16 — UX polish
 
-- [ ] Dodaj loading states wszędzie, gdzie potrzebne.
-- [ ] Dodaj empty states.
-- [ ] Dodaj spójne errors.
-- [ ] Dodaj toast feedback.
-- [ ] Dodaj destructive confirmations.
-- [ ] Zweryfikuj focus states.
-- [ ] Zweryfikuj keyboard navigation.
-- [ ] Zweryfikuj dark mode contrast.
-- [ ] Zweryfikuj responsive layout.
-- [ ] Ujednolić spacing i typography.
-- [ ] Ujednolić badge colors.
-- [ ] Usunąć zbędne animacje.
-- [ ] Commit i push.
+- [x] Dodaj loading states wszędzie, gdzie potrzebne.
+- [x] Dodaj empty states.
+- [x] Dodaj spójne errors.
+- [x] Dodaj toast feedback.
+- [x] Dodaj destructive confirmations.
+- [x] Zweryfikuj focus states.
+- [x] Zweryfikuj keyboard navigation.
+- [x] Zweryfikuj dark mode contrast.
+- [x] Zweryfikuj responsive layout.
+- [x] Ujednolić spacing i typography.
+- [x] Ujednolić badge colors.
+- [x] Usunąć zbędne animacje.
+- [x] Commit i push.
 
 ## Etap 17 — Unit tests
 
-- [ ] Skonfiguruj Vitest.
-- [ ] Przetestuj Zod schemas.
-- [ ] Przetestuj progress calculation.
-- [ ] Przetestuj overdue logic.
-- [ ] Przetestuj permission helpers.
-- [ ] Przetestuj status/priority helpers.
-- [ ] Commit i push.
+- [x] Skonfiguruj Vitest.
+- [x] Przetestuj Zod schemas.
+- [x] Przetestuj progress calculation.
+- [x] Przetestuj overdue logic.
+- [x] Przetestuj permission helpers.
+- [x] Przetestuj status/priority helpers.
+- [x] Commit i push.
 
 ## Etap 18 — Integration/security tests
 
-- [ ] Utwórz testową Organization A.
-- [ ] Utwórz testową Organization B.
-- [ ] Zweryfikuj client isolation.
-- [ ] Zweryfikuj project isolation.
-- [ ] Zweryfikuj task isolation.
-- [ ] Zweryfikuj assignment restrictions.
-- [ ] Zweryfikuj ADMIN permissions.
-- [ ] Zweryfikuj EMPLOYEE permissions.
-- [ ] Commit i push.
+- [x] Utwórz testową Organization A.
+- [x] Utwórz testową Organization B.
+- [x] Zweryfikuj client isolation.
+- [x] Zweryfikuj project isolation.
+- [x] Zweryfikuj task isolation.
+- [x] Zweryfikuj assignment restrictions.
+- [x] Zweryfikuj ADMIN permissions.
+- [x] Zweryfikuj EMPLOYEE permissions.
+- [x] Commit i push.
 
 ## Etap 19 — E2E
 
-- [ ] Skonfiguruj Playwright.
-- [ ] Dodaj admin login E2E.
-- [ ] Dodaj create client E2E.
-- [ ] Dodaj project/task flow E2E.
-- [ ] Dodaj Kanban persistence E2E.
-- [ ] Dodaj employee permission E2E.
-- [ ] Commit i push.
+- [x] Skonfiguruj Playwright.
+- [x] Dodaj admin login E2E.
+- [x] Dodaj create client E2E.
+- [x] Dodaj project/task flow E2E.
+- [x] Dodaj Kanban persistence E2E.
+- [x] Dodaj employee permission E2E.
+- [x] Commit i push.
 
 ## Etap 20 — final code verification
 
@@ -2334,20 +2335,20 @@ Projekt jest ukończony, gdy:
 
 ## Etap 22 — README i portfolio
 
-- [ ] Napisz kompletne README.
-- [ ] Dodaj architecture overview.
-- [ ] Dodaj tech stack.
-- [ ] Dodaj setup instructions.
-- [ ] Dodaj demo credentials.
-- [ ] Dodaj database/seed instructions.
-- [ ] Dodaj testing instructions.
-- [ ] Opisz multi-tenancy.
-- [ ] Opisz permissions.
-- [ ] Opisz Git/GitHub workflow.
-- [ ] Dodaj Future Improvements.
-- [ ] Przygotuj sekcję Screenshots.
-- [ ] Nie dodawaj fikcyjnego live demo.
-- [ ] Commit dokumentacji.
+- [x] Napisz kompletne README.
+- [x] Dodaj architecture overview.
+- [x] Dodaj tech stack.
+- [x] Dodaj setup instructions.
+- [x] Dodaj demo credentials.
+- [x] Dodaj database/seed instructions.
+- [x] Dodaj testing instructions.
+- [x] Opisz multi-tenancy.
+- [x] Opisz permissions.
+- [x] Opisz Git/GitHub workflow.
+- [x] Dodaj Future Improvements.
+- [x] Przygotuj sekcję Screenshots.
+- [x] Nie dodawaj fikcyjnego live demo.
+- [x] Commit dokumentacji.
 
 ## Etap 23 — final Git/GitHub delivery
 

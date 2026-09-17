@@ -20,12 +20,7 @@ export default function globalSetup() {
 
   const env = { ...process.env, DATABASE_URL: databaseUrl };
   const runPnpm = (args: string[]) =>
-    pnpmCli.endsWith(".exe")
-      ? execFileSync(pnpmCli, args, { env, stdio: "inherit" })
-      : execFileSync(process.execPath, [pnpmCli, ...args], {
-          env,
-          stdio: "inherit",
-        });
+    execFileSync(pnpmCli, args, { env, stdio: "inherit" });
 
   runPnpm(["db:deploy"]);
   runPnpm(["db:seed"]);

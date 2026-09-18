@@ -2119,7 +2119,7 @@ Projekt jest ukończony, gdy:
 - [x] Dodaj mobile navigation.
 - [x] Dodaj theme switcher.
 - [x] Dodaj shared PageHeader, badges i EmptyState.
-- [ ] Dodaj shared Skeleton.
+- [x] Dodaj shared Skeleton.
 - [x] Zweryfikuj desktop/tablet/mobile.
 - [x] Commit i push.
 
@@ -2136,7 +2136,7 @@ Projekt jest ukończony, gdy:
 - [x] Utwórz `/clients`.
 - [x] Dodaj query scoped do organization.
 - [x] Dodaj search/filter/pagination.
-- [ ] Dodaj TanStack Table.
+- [x] Dodaj TanStack Table.
 - [x] Utwórz `/clients/new`.
 - [x] Utwórz Zod schema.
 - [x] Dodaj create action + Activity Log.

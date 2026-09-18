@@ -3,16 +3,10 @@ import type { Metadata } from "next";
 import { Building2, Plus, X } from "lucide-react";
 import Link from "next/link";
 
+import { ClientTable } from "@/components/clients/client-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  EmptyState,
-  FilterBar,
-  PageHeader,
-  TableShell,
-  tdClass,
-  thClass,
-} from "@/components/ui/page";
+import { EmptyState, FilterBar, PageHeader } from "@/components/ui/page";
 import { Pagination } from "@/components/ui/pagination";
 import { Input, Select } from "@/components/ui/form-controls";
 import { clientScope, requireUser } from "@/lib/auth-helpers";
@@ -125,44 +119,17 @@ export default async function ClientsPage({
       {clients.length ? (
         <>
           <div className="hidden md:block">
-            <TableShell>
-              <table className="w-full">
-                <caption className="sr-only">Clients in this workspace</caption>
-                <thead className="bg-muted/60">
-                  <tr>
-                    <th className={thClass}>Client</th>
-                    <th className={thClass}>Company</th>
-                    <th className={thClass}>Email</th>
-                    <th className={thClass}>Projects</th>
-                    <th className={thClass}>Status</th>
-                    <th className={thClass}>Created</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {clients.map((client) => (
-                    <tr key={client.id} className="hover:bg-muted/30">
-                      <td className={tdClass}>
-                        <Link
-                          className="hover:text-primary font-medium"
-                          href={`/clients/${client.id}`}
-                        >
-                          {client.name}
-                        </Link>
-                      </td>
-                      <td className={tdClass}>{client.company ?? "—"}</td>
-                      <td className={tdClass}>{client.email ?? "—"}</td>
-                      <td className={tdClass}>{client._count.projects}</td>
-                      <td className={tdClass}>
-                        <Badge value={client.status} />
-                      </td>
-                      <td className={tdClass}>
-                        {formatDate(client.createdAt)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </TableShell>
+            <ClientTable
+              clients={clients.map((client) => ({
+                id: client.id,
+                name: client.name,
+                company: client.company,
+                email: client.email,
+                projectCount: client._count.projects,
+                status: client.status,
+                createdAt: formatDate(client.createdAt),
+              }))}
+            />
           </div>
           <div className="bg-card overflow-hidden rounded-lg border md:hidden">
             {clients.map((client) => (

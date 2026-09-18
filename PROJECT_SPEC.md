@@ -2,6 +2,8 @@
 
 > Główna instrukcja implementacyjna dla Agenta AI GPT-5.6 Sol pracującego w Visual Studio Code.
 
+> **Status:** zakres funkcjonalny MVP jest ukończony. Pozostały końcowa weryfikacja, manual QA i finalizacja repozytorium opisana w etapach 20, 21 i 23.
+
 ## 1. Cel dokumentu
 
 Agent ma samodzielnie zaprojektować, zaimplementować, przetestować, uruchomić i przygotować do publikacji kompletną aplikację webową **BusinessFlow** zgodnie z niniejszą specyfikacją.
@@ -2040,6 +2042,8 @@ Projekt jest ukończony, gdy:
 ---
 
 # 45. Roadmapa realizacji
+
+Etapy funkcjonalne 1–19 oraz dokumentacja portfolio zostały zrealizowane. Nieodhaczone etapy 20, 21 i 23 celowo pokazują pozostałe kontrole zamykające projekt.
 
 ## Etap 1 — inicjalizacja
 

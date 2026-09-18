@@ -1,5 +1,7 @@
 # BusinessFlow
 
+[![CI](https://github.com/K-Kabak/businessflow/actions/workflows/ci.yml/badge.svg)](https://github.com/K-Kabak/businessflow/actions/workflows/ci.yml)
+
 BusinessFlow is a portfolio-grade B2B SaaS application for running a small service business. It brings clients, projects, tasks, team workload, Kanban delivery, and an auditable activity trail into one focused workspace.
 
 ## Features
@@ -110,28 +112,25 @@ pnpm typecheck
 pnpm test
 ```
 
-Integration and E2E tests use isolated databases:
+Integration and E2E tests use isolated databases. In PowerShell:
 
-```bash
-set TEST_DATABASE_URL=postgresql://businessflow:businessflow@localhost:5432/businessflow_test?schema=public
-set DATABASE_URL=%TEST_DATABASE_URL%
+```powershell
+$env:TEST_DATABASE_URL="postgresql://businessflow:businessflow@localhost:5432/businessflow_test?schema=public"
+$env:DATABASE_URL=$env:TEST_DATABASE_URL
 pnpm db:deploy
 pnpm test:integration
 
-set E2E_DATABASE_URL=postgresql://businessflow:businessflow@localhost:5432/businessflow_e2e?schema=public
-set DATABASE_URL=%E2E_DATABASE_URL%
-pnpm db:deploy
-pnpm db:seed
+$env:E2E_DATABASE_URL="postgresql://businessflow:businessflow@localhost:5432/businessflow_e2e?schema=public"
 pnpm test:e2e
 ```
 
-The examples above use Windows `cmd`; use `$env:NAME="value"` in PowerShell or `export NAME=value` on POSIX systems.
+Use `export NAME=value` instead on POSIX systems. Playwright refuses database names other than `businessflow_e2e`, then applies migrations and restores the deterministic seed automatically before the suite.
 
 ## Architecture
 
 BusinessFlow is a modular Next.js monolith:
 
-- Server Components query Prisma directly through a server-only data access layer.
+- Server Components query Prisma through modules explicitly guarded with `server-only`.
 - Client Components handle forms, filters, theme state, charts, and drag-and-drop.
 - Server Actions authenticate, authorize, validate, check ownership/relationships, mutate, log activity, and revalidate affected paths.
 - Prisma composite foreign keys add database-level tenant integrity for project/client and membership relations.
@@ -150,7 +149,7 @@ BusinessFlow is a modular Next.js monolith:
 
 ## GitHub Workflow
 
-Development uses short-lived feature branches and Conventional Commits. Each milestone is linted, type-checked, and tested before merge. GitHub Actions provisions PostgreSQL and runs the same quality gates, integration suite, production build, and Playwright scenarios.
+The repository uses logical Conventional Commits on `main` and supports short-lived feature branches. GitHub Actions runs on pushes and pull requests, provisions isolated PostgreSQL databases, and executes lint, typecheck, unit and integration tests, a production build, and Playwright against `pnpm start`.
 
 ## Future Improvements
 

@@ -18,7 +18,13 @@ export default function globalSetup() {
   const pnpmCli = process.env.npm_execpath;
   if (!pnpmCli) throw new Error("Unable to locate the pnpm CLI.");
 
-  const env = { ...process.env, DATABASE_URL: databaseUrl };
+  const env = {
+    ...process.env,
+    DATABASE_URL: databaseUrl,
+    ...(process.env.VISUAL_REGRESSION
+      ? { SEED_NOW: "2026-08-31T12:00:00.000Z" }
+      : {}),
+  };
   const runPnpm = (args: string[]) =>
     execFileSync(pnpmCli, args, { env, stdio: "inherit" });
 

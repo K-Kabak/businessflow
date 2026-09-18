@@ -2043,7 +2043,7 @@ Projekt jest ukończony, gdy:
 
 # 45. Roadmapa realizacji
 
-Etapy funkcjonalne 1–19 oraz dokumentacja portfolio zostały zrealizowane. Nieodhaczone etapy 20, 21 i 23 celowo pokazują pozostałe kontrole zamykające projekt.
+Etapy funkcjonalne 1–22 zostały zrealizowane. Nieodhaczony etap 23 pokazuje pozostałe czynności Git/GitHub zamykające projekt.
 
 ## Etap 1 — inicjalizacja
 
@@ -2299,43 +2299,43 @@ Etapy funkcjonalne 1–19 oraz dokumentacja portfolio zostały zrealizowane. Nie
 
 ## Etap 20 — final code verification
 
-- [ ] Uruchom `pnpm lint`.
-- [ ] Napraw wszystkie lint errors.
-- [ ] Uruchom `pnpm typecheck`.
-- [ ] Napraw wszystkie TypeScript errors.
-- [ ] Uruchom unit tests.
-- [ ] Uruchom integration tests.
-- [ ] Uruchom E2E tests.
-- [ ] Uruchom production build.
-- [ ] Usuń debug logs.
-- [ ] Usuń dead code.
-- [ ] Usuń nieużywane dependencies.
-- [ ] Sprawdź brak `any` bez uzasadnienia.
-- [ ] Sprawdź brak sekretów.
-- [ ] Commit poprawek końcowych.
+- [x] Uruchom `pnpm lint`.
+- [x] Napraw wszystkie lint errors.
+- [x] Uruchom `pnpm typecheck`.
+- [x] Napraw wszystkie TypeScript errors.
+- [x] Uruchom unit tests.
+- [x] Uruchom integration tests.
+- [x] Uruchom E2E tests.
+- [x] Uruchom production build.
+- [x] Usuń debug logs.
+- [x] Usuń dead code.
+- [x] Usuń nieużywane dependencies.
+- [x] Sprawdź brak `any` bez uzasadnienia.
+- [x] Sprawdź brak sekretów.
+- [x] Commit poprawek końcowych.
 
 ## Etap 21 — manual QA
 
-- [ ] Zresetuj bazę.
-- [ ] Uruchom migracje od zera.
-- [ ] Uruchom seed.
-- [ ] Zaloguj się jako ADMIN.
-- [ ] Sprawdź Dashboard.
-- [ ] Utwórz i edytuj klienta.
-- [ ] Utwórz projekt.
-- [ ] Przypisz pracownika.
-- [ ] Utwórz task.
-- [ ] Przesuń task w Kanbanie.
-- [ ] Odśwież i sprawdź persistence.
-- [ ] Sprawdź Activity Log.
-- [ ] Zaloguj się jako EMPLOYEE.
-- [ ] Sprawdź ograniczenie danych.
-- [ ] Sprawdź admin-only routes.
-- [ ] Sprawdź foreign tenant IDs.
-- [ ] Sprawdź dark mode.
-- [ ] Sprawdź mobile navigation.
-- [ ] Sprawdź empty states.
-- [ ] Sprawdź błędne formularze.
+- [x] Przygotuj świeżą izolowaną bazę QA.
+- [x] Uruchom migracje od zera.
+- [x] Uruchom seed.
+- [x] Zaloguj się jako ADMIN.
+- [x] Sprawdź Dashboard.
+- [x] Utwórz i edytuj klienta.
+- [x] Utwórz projekt.
+- [x] Przypisz pracownika.
+- [x] Utwórz task.
+- [x] Przesuń task w Kanbanie.
+- [x] Odśwież i sprawdź persistence.
+- [x] Sprawdź Activity Log.
+- [x] Zaloguj się jako EMPLOYEE.
+- [x] Sprawdź ograniczenie danych.
+- [x] Sprawdź admin-only routes.
+- [x] Sprawdź foreign tenant IDs.
+- [x] Sprawdź dark mode.
+- [x] Sprawdź mobile navigation.
+- [x] Sprawdź empty states.
+- [x] Sprawdź błędne formularze.
 
 ## Etap 22 — README i portfolio
 

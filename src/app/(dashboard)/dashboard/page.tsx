@@ -21,6 +21,13 @@ import { formatDate, humanize, relativeDeadline } from "@/lib/format";
 import { isOverdue, startOfTodayUtc } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Dashboard" };
+const projectStatusOrder = [
+  "PLANNING",
+  "IN_PROGRESS",
+  "ON_HOLD",
+  "COMPLETED",
+  "CANCELLED",
+] as const;
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -72,7 +79,7 @@ export default async function DashboardPage() {
     }),
     prisma.activityLog.findMany({
       where: logWhere,
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: 8,
       include: { user: { select: { name: true } } },
     }),
@@ -110,6 +117,9 @@ export default async function DashboardPage() {
                   {label}
                 </p>
                 <p
+                  data-visual-dynamic={
+                    label === "Overdue tasks" ? "" : undefined
+                  }
                   className={`mt-2 text-[28px] leading-8 font-semibold tracking-[-0.03em] ${danger ? "text-danger" : ""}`}
                 >
                   {value}
@@ -133,10 +143,16 @@ export default async function DashboardPage() {
             </p>
           </div>
           <ProjectChart
-            data={groups.map((item) => ({
-              status: humanize(item.status),
-              count: item._count._all,
-            }))}
+            data={[...groups]
+              .sort(
+                (a, b) =>
+                  projectStatusOrder.indexOf(a.status) -
+                  projectStatusOrder.indexOf(b.status),
+              )
+              .map((item) => ({
+                status: humanize(item.status),
+                count: item._count._all,
+              }))}
           />
         </div>
         <div className="p-5">
@@ -162,9 +178,10 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   <span
+                    data-visual-dynamic
                     className={`shrink-0 text-right text-[11px] font-medium ${isOverdue(task.deadline, task.status) ? "text-danger" : "text-muted-foreground"}`}
                   >
-                    <span className="block" data-visual-dynamic>
+                    <span className="block">
                       {relativeDeadline(task.deadline)}
                     </span>
                     <span className="mt-0.5 block font-normal">
@@ -203,7 +220,10 @@ export default async function DashboardPage() {
                       {item.user?.name ?? "System"}
                     </p>
                   </div>
-                  <time className="text-muted-foreground flex items-center gap-1 text-[11px] whitespace-nowrap">
+                  <time
+                    data-visual-dynamic
+                    className="text-muted-foreground flex items-center gap-1 text-[11px] whitespace-nowrap"
+                  >
                     <Clock3 className="size-3" />
                     {formatDate(item.createdAt)}
                   </time>

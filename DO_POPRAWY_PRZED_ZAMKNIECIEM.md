@@ -630,15 +630,15 @@ Projekt można uznać za finalnie zamknięty dopiero, gdy:
 - [x] Cross-tenant Server Actions są zabezpieczone i pokryte testami.
 - [x] E2E są deterministyczne.
 - [x] CI uruchamia Playwright przeciwko production buildowi.
-- [ ] `pnpm lint` przechodzi.
-- [ ] `pnpm typecheck` przechodzi.
-- [ ] `pnpm test` przechodzi.
-- [ ] `pnpm build` przechodzi.
-- [ ] `pnpm test:integration` przechodzi.
-- [ ] `pnpm test:e2e` przechodzi.
+- [x] `pnpm lint` przechodzi.
+- [x] `pnpm typecheck` przechodzi.
+- [x] `pnpm test` przechodzi.
+- [x] `pnpm build` przechodzi.
+- [x] `pnpm test:integration` przechodzi.
+- [x] `pnpm test:e2e` przechodzi.
 - [x] `PROJECT_SPEC.md` pokazuje prawdziwy status MVP.
 - [x] README odpowiada aktualnej implementacji.
-- [ ] repo nie zawiera sekretów ani artefaktów testowych.
+- [x] repo nie zawiera sekretów ani artefaktów testowych.
 - [ ] `git status` jest czysty.
 - [ ] wszystkie finalne zmiany zostały zacommitowane.
 - [ ] finalny push został wykonany.

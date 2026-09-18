@@ -29,12 +29,33 @@ test("admin signs in and creates a client", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "E2E Example Client" }),
   ).toBeVisible();
+  await page.getByRole("link", { name: "Edit" }).click();
+  await page.getByLabel("Client name").fill("E2E Example Client Updated");
+  await page.getByRole("button", { name: "Save changes" }).click();
+  await expect(
+    page.getByRole("heading", { name: "E2E Example Client Updated" }),
+  ).toBeVisible();
+});
+
+test("client form validation and filtered empty state are usable", async ({
+  page,
+}) => {
+  await signIn(page);
+  await page.goto("/clients/new");
+  await page.getByRole("button", { name: "Create client" }).click();
+  await expect(page.getByText("Name is required.")).toBeVisible();
+
+  await page.goto("/clients?search=definitely-no-client");
+  await expect(
+    page.getByRole("heading", { name: "No clients match these filters" }),
+  ).toBeVisible();
 });
 
 test("admin can create a project and task", async ({ page }) => {
   await signIn(page);
   await page.goto("/projects/new");
   await page.getByLabel("Project name").fill("E2E Delivery Project");
+  await page.getByLabel(/Marek Nowak/).check();
   await page.getByRole("button", { name: "Create project" }).click();
   await expect(
     page.getByRole("heading", { name: "E2E Delivery Project" }),

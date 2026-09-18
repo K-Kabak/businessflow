@@ -17,6 +17,10 @@ test("core UI routes, theme, and mobile navigation remain usable", async ({
     ["/projects", "Projects"],
     ["/tasks", "Tasks"],
     ["/board", "Board"],
+    ["/team", "Team"],
+    ["/activity", "Activity"],
+    ["/settings/profile", "Profile settings"],
+    ["/settings/organization", "Organization settings"],
   ] as const;
 
   for (const [path, heading] of routes) {
@@ -40,4 +44,9 @@ test("core UI routes, theme, and mobile navigation remain usable", async ({
   await expect(
     page.getByRole("button", { name: "Open navigation" }),
   ).toBeVisible();
+
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  await page.getByRole("button", { name: "Open account menu" }).click();
+  await page.getByRole("menuitem", { name: "Sign out" }).click();
+  await expect(page).toHaveURL(/\/login/);
 });

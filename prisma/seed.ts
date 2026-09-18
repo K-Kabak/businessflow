@@ -16,6 +16,10 @@ if (!connectionString) throw new Error("DATABASE_URL is not configured.");
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString }),
 });
+const seedNow = process.env.SEED_NOW
+  ? new Date(process.env.SEED_NOW)
+  : new Date();
+if (Number.isNaN(seedNow.getTime())) throw new Error("SEED_NOW is invalid.");
 
 const clientNames = [
   "Nova Studio",
@@ -39,56 +43,56 @@ const projectDefinitions: Array<{
     status: "IN_PROGRESS",
     priority: "HIGH",
     budget: 42000,
-    deadline: addDays(new Date(), 21),
+    deadline: addDays(seedNow, 21),
   },
   {
     name: "Marketing Campaign",
     status: "PLANNING",
     priority: "MEDIUM",
     budget: 18000,
-    deadline: addDays(new Date(), 35),
+    deadline: addDays(seedNow, 35),
   },
   {
     name: "CRM Integration",
     status: "ON_HOLD",
     priority: "HIGH",
     budget: 67000,
-    deadline: addDays(new Date(), 50),
+    deadline: addDays(seedNow, 50),
   },
   {
     name: "Brand Identity",
     status: "COMPLETED",
     priority: "MEDIUM",
     budget: 14000,
-    deadline: subDays(new Date(), 18),
+    deadline: subDays(seedNow, 18),
   },
   {
     name: "E-commerce Launch",
     status: "IN_PROGRESS",
     priority: "HIGH",
     budget: 86000,
-    deadline: addDays(new Date(), 14),
+    deadline: addDays(seedNow, 14),
   },
   {
     name: "SEO Campaign",
     status: "COMPLETED",
     priority: "LOW",
     budget: 12000,
-    deadline: subDays(new Date(), 30),
+    deadline: subDays(seedNow, 30),
   },
   {
     name: "Client Portal",
     status: "PLANNING",
     priority: "MEDIUM",
     budget: 54000,
-    deadline: addDays(new Date(), 60),
+    deadline: addDays(seedNow, 60),
   },
   {
     name: "Analytics Dashboard",
     status: "IN_PROGRESS",
     priority: "HIGH",
     budget: 39000,
-    deadline: addDays(new Date(), 28),
+    deadline: addDays(seedNow, 28),
   },
 ];
 
@@ -174,6 +178,7 @@ async function main() {
               ? "Strategic account with quarterly planning reviews."
               : null,
           status: index === 6 ? "INACTIVE" : "ACTIVE",
+          createdAt: seedNow,
         },
       }),
     ),
@@ -187,7 +192,7 @@ async function main() {
         clientId: clients[index].id,
         ...definition,
         description: `Delivery plan for ${definition.name.toLowerCase()}, including discovery, implementation, review, and handoff.`,
-        startDate: subDays(new Date(), 10 + index * 3),
+        startDate: subDays(seedNow, 10 + index * 3),
       },
     });
     if (index !== 3 && index !== 5) {
@@ -219,10 +224,10 @@ async function main() {
     positions[status] += 1000;
     const deadline =
       index === 0
-        ? subDays(new Date(), 5)
+        ? subDays(seedNow, 5)
         : index === 1
-          ? subDays(new Date(), 2)
-          : addDays(new Date(), 2 + index);
+          ? subDays(seedNow, 2)
+          : addDays(seedNow, 2 + index);
     const task = await prisma.task.create({
       data: {
         organizationId: organization.id,
@@ -251,22 +256,25 @@ async function main() {
         action: "CREATED",
         description:
           "Anna Kowalska created the Acme Creative Studio workspace.",
+        createdAt: seedNow,
       },
-      ...clients.slice(0, 4).map((client) => ({
+      ...clients.slice(0, 4).map((client, index) => ({
         organizationId: organization.id,
         userId: admin.id,
         entityType: "CLIENT" as const,
         entityId: client.id,
         action: "CREATED" as const,
         description: `Anna Kowalska created client “${client.name}”.`,
+        createdAt: new Date(seedNow.getTime() + (index + 1) * 1000),
       })),
-      ...projects.slice(0, 4).map((project) => ({
+      ...projects.slice(0, 4).map((project, index) => ({
         organizationId: organization.id,
         userId: admin.id,
         entityType: "PROJECT" as const,
         entityId: project.id,
         action: "CREATED" as const,
         description: `Anna Kowalska created project “${project.name}”.`,
+        createdAt: new Date(seedNow.getTime() + (index + 5) * 1000),
       })),
       ...tasks.slice(0, 5).map((task, index) => ({
         organizationId: organization.id,
@@ -279,6 +287,7 @@ async function main() {
             ? `Marek Nowak moved task “${task.title}” to ${task.status}.`
             : `Anna Kowalska created task “${task.title}”.`,
         metadata: { projectId: task.projectId },
+        createdAt: new Date(seedNow.getTime() + (index + 9) * 1000),
       })),
     ],
   });

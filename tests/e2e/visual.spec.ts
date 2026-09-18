@@ -58,7 +58,7 @@ for (const screen of screens) {
         });
         await expect(page).toHaveScreenshot(
           `${screen.name}-${viewport.name}-${theme}.png`,
-          { animations: "disabled", caret: "hide", fullPage: false },
+          { animations: "disabled", caret: "initial", fullPage: false },
         );
       });
     }

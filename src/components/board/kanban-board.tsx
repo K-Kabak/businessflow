@@ -88,6 +88,7 @@ function TaskCardContent({
       </div>
       {task.deadline ? (
         <p
+          data-visual-dynamic
           className={cn(
             "text-muted-foreground mt-3 flex items-center gap-1.5 pl-7 text-[11px]",
             isOverdue(new Date(task.deadline), task.status) &&
